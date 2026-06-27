@@ -102,122 +102,15 @@
   </section>
 
   <!-- ========================================
-       ESTADÍSTICAS GENERALES
-       ======================================== -->
-  <section>
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Rendimiento</span>
-        <h2>Estadísticas de la Temporada</h2>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">📋</div>
-          <div class="stat-number">7</div>
-          <div class="stat-label">Partidos Jugados</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🏆</div>
-          <div class="stat-number">5</div>
-          <div class="stat-label">Victorias</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📊</div>
-          <div class="stat-number">2</div>
-          <div class="stat-label">Derrotas</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📈</div>
-          <div class="stat-number">71.4%</div>
-          <div class="stat-label">Rendimiento</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========================================
-       PRÓXIMOS EVENTOS
+       PRÓXIMOS PARTIDOS
        ======================================== -->
   <section class="section-gray">
     <div class="container">
       <div class="section-header">
         <span class="section-tag">Calendario</span>
-        <h2>Próximos Eventos</h2>
+        <h2>Próximos Partidos</h2>
       </div>
-    
-    <div class="grid grid-2">
-      <div class="next-match">
-        <p class="match-label">Próxima Competición</p>
-        <div class="match-teams">
-          <div class="team">
-            <p class="team-name">VCPL</p>
-          </div>
-          <div class="vs">VS</div>
-          <div class="team">
-            <p class="team-name">Valencia</p>
-          </div>
-        </div>
-        <div class="match-info">
-          <p class="match-date-time">📅 1 DIC 2024 - ⏰ 20:30</p>
-          <p class="countdown">📍 Pabellón La Placeta</p>
-          <p class="countdown" style="margin-top: 0.8rem;">🎟️ Disponibles (500 - €15)</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <h3 class="card-title">Información de Partidos</h3>
-          <p class="card-text" style="margin-bottom: 1rem;">
-            Mantente actualizado con todos nuestros partidos, entrenamientos y eventos especiales.
-          </p>
-          <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">
-            <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Suscripción:</strong> Recibe notificaciones de próximos partidos</p>
-            <a href="contacto.html" class="btn btn-primary" style="margin-top: 1rem; display: inline-block;">Inscribirse</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========================================
-       CALENDARIO
-       ======================================== -->
-  <section>
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Planificación</span>
-        <h2>Calendario de Competiciones</h2>
-      </div>
-      <div class="calendar-list">
-        <div class="calendar-item">
-          <div>
-            <h4>Superliga Estatal</h4>
-            <p class="cal-info">MASCULINO · Sep 2025 - May 2026</p>
-          </div>
-          <span class="cal-status">En curso</span>
-        </div>
-        <div class="calendar-item">
-          <div>
-            <h4>Liga Regional</h4>
-            <p class="cal-info">FEMENINO · Sep 2025 - Abr 2026</p>
-          </div>
-          <span class="cal-status">En curso</span>
-        </div>
-        <div class="calendar-item">
-          <div>
-            <h4>Juvenil Autonómico</h4>
-            <p class="cal-info">MIXTO · Oct 2025 - Mar 2026</p>
-          </div>
-          <span class="cal-status">En curso</span>
-        </div>
-        <div class="calendar-item">
-          <div>
-            <h4>Copa del Rey</h4>
-            <p class="cal-info">MASCULINO · Ene 2026 - Feb 2026</p>
-          </div>
-          <span class="cal-status">Próxima fase</span>
-        </div>
-      </div>
+      <div id="upcoming-matches-container" class="grid grid-2"></div>
     </div>
   </section>
 

@@ -549,6 +549,7 @@ function initPlayersPage() {
 function initTournamentsPage() {
   renderTournamentsGrid();
   renderMatchesTable();
+  renderUpcomingMatches();
 }
 
 function initHomePage() {
