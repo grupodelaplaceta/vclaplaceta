@@ -54,10 +54,14 @@ const CRM_DEFAULT = {
     },
     proyectosBloqueados: [],
     historial: [
-      { id: 1, fecha: '2026-01-15', concepto: 'Aportación inicial Junta', tipo: 'ingreso', cantidad: 15000, categoria: 'aportacion', registradoPor: 'gestor' }
+      { id: 1, fecha: '2026-01-15', concepto: 'Aportación inicial Junta', tipo: 'ingreso', cantidad: 15000, categoria: 'aportacion', registradoPor: 'gestor' },
+      { id: 2, fecha: '2026-02-01', concepto: 'Pago cuotas enero', tipo: 'ingreso', cantidad: 120, categoria: 'cuotas', registradoPor: 'gestor' },
+      { id: 3, fecha: '2026-03-01', concepto: 'Pago cuotas febrero', tipo: 'ingreso', cantidad: 120, categoria: 'cuotas', registradoPor: 'gestor' },
+      { id: 4, fecha: '2026-04-01', concepto: 'Pago cuotas marzo', tipo: 'ingreso', cantidad: 120, categoria: 'cuotas', registradoPor: 'gestor' },
+      { id: 5, fecha: '2026-05-01', concepto: 'Pago cuotas abril', tipo: 'ingreso', cantidad: 120, categoria: 'cuotas', registradoPor: 'gestor' }
     ]
   },
-  // CUOTAS - Sistema simplificado
+  // CUOTAS
   cuotas: {
     inscripcion: 35,
     mensualidadOrdinaria: 10,
@@ -65,7 +69,18 @@ const CRM_DEFAULT = {
     modalidades: [
       { id: 'mensual', nombre: 'Mensual', meses: 1, factor: 1.0, descripcion: 'Pago cada mes' }
     ],
-    pagos: [],
+    pagos: [
+      { id: 1, miembroId: 1, mes: '2026-01', importe: 35, pagado: true, fechaPago: '2026-01-05', registradoPor: 'gestor' },
+      { id: 2, miembroId: 2, mes: '2026-01', importe: 35, pagado: true, fechaPago: '2026-01-10', registradoPor: 'gestor' },
+      { id: 3, miembroId: 3, mes: '2026-01', importe: 35, pagado: true, fechaPago: '2026-01-12', registradoPor: 'gestor' },
+      { id: 4, miembroId: 4, mes: '2026-01', importe: 35, pagado: true, fechaPago: '2026-01-03', registradoPor: 'gestor' },
+      { id: 5, miembroId: 5, mes: '2026-02', importe: 35, pagado: true, fechaPago: '2026-02-05', registradoPor: 'gestor' },
+      { id: 6, miembroId: 6, mes: '2026-02', importe: 35, pagado: true, fechaPago: '2026-02-10', registradoPor: 'gestor' },
+      { id: 7, miembroId: 1, mes: '2026-02', importe: 10, pagado: true, fechaPago: '2026-02-03', registradoPor: 'gestor' },
+      { id: 8, miembroId: 2, mes: '2026-02', importe: 10, pagado: true, fechaPago: '2026-02-08', registradoPor: 'gestor' },
+      { id: 9, miembroId: 3, mes: '2026-03', importe: 10, pagado: false, fechaPago: null, registradoPor: 'gestor' },
+      { id: 10, miembroId: 4, mes: '2026-03', importe: 10, pagado: true, fechaPago: '2026-03-05', registradoPor: 'gestor' }
+    ],
     miembros: [
       { id: 1, nombre: 'David Hernández', email: 'david@email.com', telefono: '612345678', posicion: 'Líbero', modalidadId: 'mensual', cuotaPersonalizada: null, fechaAlta: '2026-01-01', activo: true },
       { id: 2, nombre: 'Javier Robles', email: 'javier@email.com', telefono: '623456789', posicion: 'Colocador', modalidadId: 'mensual', cuotaPersonalizada: null, fechaAlta: '2026-01-01', activo: true },
@@ -76,20 +91,37 @@ const CRM_DEFAULT = {
     ],
     solicitudesPendientes: []
   },
-  // TORNEOS - Inscripciones
+  // TORNEOS
   torneos: {
-    inscripciones: []
+    inscripciones: [
+      { id: 1, nombre: 'Superliga Estatal', fecha: '2026-02-15', jugadoresAsistentes: [1,2,3,4,5,6], precioPorJugador: 50, estado: 'inscrito', aprobadoPor: 'gestor', solicitadoPor: 'responsable' },
+      { id: 2, nombre: 'Liga Regional', fecha: '2026-03-20', jugadoresAsistentes: [1,2,3,4,5,6], precioPorJugador: 45, estado: 'inscrito', aprobadoPor: 'gestor', solicitadoPor: 'responsable' }
+    ]
   },
   // PARTIDOS
-  partidos: [],
+  partidos: [
+    { id: 1, fecha: '2026-05-15', hora: '20:30', torneo: 'Superliga Estatal', local: 'Voley Club La Placeta', visitante: 'CV Tarragona', setsLocal: 3, setsVisitante: 1, resultado: 'Victoria', tipo: 'torneo' },
+    { id: 2, fecha: '2026-05-08', hora: '19:00', torneo: 'Liga Regional', local: 'Reus Voleibol', visitante: 'Voley Club La Placeta', setsLocal: 2, setsVisitante: 3, resultado: 'Victoria', tipo: 'torneo' },
+    { id: 3, fecha: '2026-06-20', hora: '11:00', torneo: '', local: 'Voley Club La Placeta', visitante: 'Universidad Tarragona', setsLocal: 2, setsVisitante: 2, resultado: 'Empate', tipo: 'amistoso' }
+  ],
   // PATROCINIOS
   patrocinios: [],
   // NOTICIAS
-  noticias: [],
+  noticias: [
+    { id: 1, fecha: '2026-06-15', titulo: '¡Victoria en casa! VCPL vence al CV Tarragona', resumen: 'Nuestro equipo se impuso por 3-0.', contenido: 'Gran actuación.', categoria: 'Partidos', destacada: true, imagen: '' },
+    { id: 2, fecha: '2026-06-10', titulo: 'Abiertas inscripciones temporada 2026-2027', resumen: 'Ya puedes apuntarte al club.', contenido: 'Ampliamos plantilla.', categoria: 'Convocatoria', destacada: true, imagen: '' }
+  ],
   // REVISIONES
-  revisiones: [],
+  revisiones: [
+    { id: 1, fecha: '2026-01-05', usuario: 'gestor', accion: 'Pago registrado', detalle: 'David Hernández - Enero 2026 - 35€' },
+    { id: 2, fecha: '2026-02-15', usuario: 'responsable', accion: 'Torneo solicitado', detalle: 'Superliga Estatal' },
+    { id: 3, fecha: '2026-02-16', usuario: 'gestor', accion: 'Torneo aprobado', detalle: 'Superliga Estatal' }
+  ],
   // NOTIFICACIONES
-  notificaciones: []
+  notificaciones: [
+    { id: 1, fecha: '2026-06-15', mensaje: 'Nuevo partido registrado: Victoria vs CV Tarragona', tipo: 'info', leida: false, url: 'admin-torneos.html' },
+    { id: 2, fecha: '2026-06-10', mensaje: 'Cuota de Miguel Torres pendiente (marzo)', tipo: 'alerta', leida: false, url: 'admin-cuotas.html' }
+  ]
 };
 
 // ========================================
