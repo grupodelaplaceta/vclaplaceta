@@ -502,7 +502,6 @@ function initTournamentsPage() {
 function initHomePage() {
   renderNextMatch();
   renderNewsFeed();
-  renderClubStats('club-stats');
 }
 
 function initSponsors() {
