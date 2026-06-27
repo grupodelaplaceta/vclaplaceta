@@ -132,6 +132,32 @@
   <script src="js/data.js"></script>
   <script src="js/api-client.js"></script>
   <script src="js/app.js"></script>
-  <script>document.addEventListener('DOMContentLoaded',()=>{initTournamentsPage();initBackToTop()});</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const pAPI = await API.getPartidos();
+        if (pAPI && pAPI.length > 0) {
+          matches.length = 0;
+          pAPI.forEach(p => matches.push({
+            id: p.id, date: p.fecha, time: p.hora, tipo: p.tipo || 'torneo',
+            tournament: p.torneo || '', homeTeam: p.local, awayTeam: p.visitante,
+            homeScore: p.setsLocal, awayScore: p.setsVisitante,
+            status: 'Finalizado', winner: p.resultado === 'Victoria' ? 'Voley Club La Placeta' : p.resultado === 'Empate' ? 'Empate' : p.visitante
+          }));
+        }
+      } catch(e) {}
+      try {
+        const tAPI = await API.getTorneos();
+        if (tAPI && tAPI.length > 0) {
+          tournaments.length = 0;
+          tAPI.forEach(t => tournaments.push({
+            id: t.id, name: t.nombre, level: '', season: '2026', status: t.estado, division: ''
+          }));
+        }
+      } catch(e) {}
+      initTournamentsPage();
+      initBackToTop();
+    });
+  </script>
 </body>
 </html>

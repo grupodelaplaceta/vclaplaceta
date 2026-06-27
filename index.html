@@ -241,25 +241,18 @@
   <script src="js/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // Noticias desde API (obligatorio)
       try {
         const noticiasAPI = await API.getNoticias();
         if (noticiasAPI && noticiasAPI.length > 0) {
           news.length = 0;
-          noticiasAPI.forEach(n => {
-            news.push({
-              id: n.id, date: n.fecha, title: n.titulo,
-              excerpt: n.resumen, content: n.contenido || '',
-              category: n.categoria || 'Noticia',
-              featured: n.destacada || false,
-              image: n.imagen || ''
-            });
-          });
+          noticiasAPI.forEach(n => news.push({
+            id: n.id, date: n.fecha, title: n.titulo,
+            excerpt: n.resumen, content: n.contenido || '',
+            category: n.categoria || 'Noticia',
+            featured: n.destacada || false, image: n.imagen || ''
+          }));
         }
-      } catch(e) {
-        console.warn('API no disponible, usando datos locales');
-      }
-      
+      } catch(e) { console.warn('API no disponible'); }
       initHomePage();
       initSponsors();
       initBackToTop();
