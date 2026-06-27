@@ -1,0 +1,16 @@
+<svg width="640" height="760" viewBox="0 0 640 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="760" fill="#141018"/>
+  <path d="M0 0H640V760H0V0Z" fill="url(#paint0_linear)"/>
+  <circle cx="320" cy="238" r="102" fill="#ffffff" fill-opacity="0.12"/>
+  <path d="M140 668C154 520 222 421 320 421C418 421 486 520 500 668H140Z" fill="#ffffff" fill-opacity="0.14"/>
+  <path d="M44 74L594 626" stroke="#ff751f" stroke-width="18" stroke-opacity="0.35"/>
+  <path d="M596 112L82 630" stroke="#3f00d8" stroke-width="30" stroke-opacity="0.55"/>
+  <text x="320" y="710" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="34" fill="#ffffff" fill-opacity="0.78">LA PLACETA</text>
+  <defs>
+    <linearGradient id="paint0_linear" x1="60" y1="22" x2="633" y2="737" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3f00d8"/>
+      <stop offset="0.48" stop-color="#17101f"/>
+      <stop offset="1" stop-color="#ff751f"/>
+    </linearGradient>
+  </defs>
+</svg>

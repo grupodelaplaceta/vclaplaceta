@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Competiciones y Resultados - Voley Club La Placeta">
+  <title>Voley Club La Placeta | Competición</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta name="theme-color" content="#2a0090">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ========================================
+       TOP BAR
+       ======================================== -->
+  <div class="top-bar">
+    <div class="container">
+      <div class="top-bar-contact">
+        <a href="mailto:voleyclub@laplaceta.org"><i class="fas fa-envelope"></i> voleyclub@laplaceta.org</a>
+        <a href="#"><i class="fas fa-map-marker-alt"></i> Tarragona, España</a>
+      </div>
+      <div class="top-bar-social">
+        <a href="https://instagram.com/vclaplaceta" target="_blank" aria-label="Instagram @vclaplaceta"><i class="fab fa-instagram"></i></a>
+        <a href="https://youtube.com/@grupodelaplaceta" target="_blank" aria-label="YouTube @grupodelaplaceta"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       HEADER
+       ======================================== -->
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo-section">
+        <img src="assets/logo-placeta.svg" alt="Voley Club La Placeta" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';">
+        <span id="logoFallback" class="logo-placeholder">V</span>
+        <span class="club-name">Voley Club <span class="text-accent">La Placeta</span></span>
+      </a>
+
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="jugadores.html">El Club</a></li>
+          <li><a href="torneos.html" class="active">Competición</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+          <li><a href="admin/login.html" class="btn-nav">CRM</a></li>
+          <li><a href="contacto.html" class="btn-nav">Inscribirse</a></li>
+        </ul>
+      </nav>
+
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================
+       HERO
+       ======================================== -->
+  <section class="hero">
+    <div class="hero-content">
+      <div style="margin-bottom:1.5rem;">
+        <span style="display:inline-block; background:rgba(255,255,255,0.15); padding:0.3rem 1rem; border-radius:50px; font-size:0.8rem; font-weight:600; color:#fff; text-transform:uppercase;">🏆 Competiciones</span>
+      </div>
+      <h1>Competición y Resultados</h1>
+      <p>Torneos, Ligas y registro de partidos</p>
+    </div>
+  </section>
+
+  <!-- ========================================
+       TORNEOS Y LIGAS
+       ======================================== -->
+  <section class="container" style="padding: 4rem 2rem;">
+    <div class="section-header">
+      <span class="section-tag">Competiciones 2025-2026</span>
+      <h2>Torneos y Ligas</h2>
+      <p>Nuestros equipos participan en competiciones de nivel regional y nacional.</p>
+    </div>
+    <div id="tournaments-container" class="grid grid-3"></div>
+  </section>
+
+  <!-- ========================================
+       HISTORIAL DE PARTIDOS
+       ======================================== -->
+  <section class="section-gray">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Temporada 2025-2026</span>
+        <h2>Historial de Partidos</h2>
+        <p>Últimos partidos jugados por nuestros equipos. Revisa todos los resultados.</p>
+      </div>
+      <div id="matches-container"></div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       ESTADÍSTICAS GENERALES
+       ======================================== -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Rendimiento</span>
+        <h2>Estadísticas de la Temporada</h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-number">7</div>
+          <div class="stat-label">Partidos Jugados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-number">5</div>
+          <div class="stat-label">Victorias</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-number">2</div>
+          <div class="stat-label">Derrotas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-number">71.4%</div>
+          <div class="stat-label">Rendimiento</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       PRÓXIMOS EVENTOS
+       ======================================== -->
+  <section class="section-gray">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Calendario</span>
+        <h2>Próximos Eventos</h2>
+      </div>
+    
+    <div class="grid grid-2">
+      <div class="next-match">
+        <p class="match-label">Próxima Competición</p>
+        <div class="match-teams">
+          <div class="team">
+            <p class="team-name">VCPL</p>
+          </div>
+          <div class="vs">VS</div>
+          <div class="team">
+            <p class="team-name">Valencia</p>
+          </div>
+        </div>
+        <div class="match-info">
+          <p class="match-date-time">📅 1 DIC 2024 - ⏰ 20:30</p>
+          <p class="countdown">📍 Pabellón La Placeta</p>
+          <p class="countdown" style="margin-top: 0.8rem;">🎟️ Disponibles (500 - €15)</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Información de Partidos</h3>
+          <p class="card-text" style="margin-bottom: 1rem;">
+            Mantente actualizado con todos nuestros partidos, entrenamientos y eventos especiales.
+          </p>
+          <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">
+            <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Suscripción:</strong> Recibe notificaciones de próximos partidos</p>
+            <a href="contacto.html" class="btn btn-primary" style="margin-top: 1rem; display: inline-block;">Inscribirse</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       CALENDARIO
+       ======================================== -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Planificación</span>
+        <h2>Calendario de Competiciones</h2>
+      </div>
+      <div class="calendar-list">
+        <div class="calendar-item">
+          <div>
+            <h4>Superliga Estatal</h4>
+            <p class="cal-info">MASCULINO · Sep 2025 - May 2026</p>
+          </div>
+          <span class="cal-status">En curso</span>
+        </div>
+        <div class="calendar-item">
+          <div>
+            <h4>Liga Regional</h4>
+            <p class="cal-info">FEMENINO · Sep 2025 - Abr 2026</p>
+          </div>
+          <span class="cal-status">En curso</span>
+        </div>
+        <div class="calendar-item">
+          <div>
+            <h4>Juvenil Autonómico</h4>
+            <p class="cal-info">MIXTO · Oct 2025 - Mar 2026</p>
+          </div>
+          <span class="cal-status">En curso</span>
+        </div>
+        <div class="calendar-item">
+          <div>
+            <h4>Copa del Rey</h4>
+            <p class="cal-info">MASCULINO · Ene 2026 - Feb 2026</p>
+          </div>
+          <span class="cal-status">Próxima fase</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       FOOTER
+       ======================================== -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="footer-brand">Voley Club La Placeta</div>
+          <p>Proyecto que impulsa el deporte dando visibilidad a la Asociación Grupo de La Placeta. Club oficial de voleibol con sede en Tarragona.</p>
+          <div class="footer-social">
+            <a href="https://instagram.com/vclaplaceta" target="_blank" aria-label="Instagram @vclaplaceta"><i class="fab fa-instagram"></i></a>
+            <a href="https://youtube.com/@grupodelaplaceta" target="_blank" aria-label="YouTube @grupodelaplaceta"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>El Club</h4>
+          <ul>
+            <li><a href="jugadores.html">Nuestro Equipo</a></li>
+            <li><a href="jugadores.html">Historia</a></li>
+            <li><a href="torneos.html">Competiciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Competición</h4>
+          <ul>
+            <li><a href="torneos.html">Torneos</a></li>
+            <li><a href="torneos.html">Resultados</a></li>
+            <li><a href="torneos.html">Calendario</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Contacto</h4>
+          <ul>
+            <li><a href="mailto:voleyclub@laplaceta.org"><i class="fas fa-envelope" style="margin-right:0.5rem;"></i>voleyclub@laplaceta.org</a></li>
+            <li><a href="#"><i class="fas fa-map-marker-alt" style="margin-right:0.5rem;"></i>Tarragona, España</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 <span class="accent">Voley Club La Placeta</span>. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop" aria-label="Volver arriba"><i class="fas fa-chevron-up"></i></button>
+
+  <script src="js/data.js"></script>
+  <script src="js/api-client.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initTournamentsPage();
+      initBackToTop();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuotas y Socios - CRM Voley Club La Placeta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">V</div>
+        <div class="sidebar-brand">Voley Club<br><span>La Placeta</span></div>
+      </div>
+      <div class="sidebar-user" id="sidebarUser"><strong>Cargando...</strong><span class="role-badge">-</span></div>
+      <div class="sidebar-nav">
+        <div class="nav-label">Panel</div>
+        <a href="dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <div class="nav-label">Gestión</div>
+        <a href="finanzas.html"><i class="fas fa-euro-sign"></i> Fondos</a>
+        <a href="cuotas.html" class="active"><i class="fas fa-users"></i> Cuotas y Socios</a>
+        <a href="torneos.html"><i class="fas fa-trophy"></i> Torneos</a>
+        <div class="nav-label">Sistema</div>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+      </div>
+      <div class="sidebar-footer">
+        <a href="../index.html"><i class="fas fa-external-link-alt"></i> Ver web pública</a>
+      </div>
+    </nav>
+    <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); document.querySelector('.sidebar-overlay').classList.remove('show')"></div>
+
+    <div class="main-content">
+      <div class="admin-topbar">
+        <h2><i class="fas fa-users"></i> Cuotas y Socios</h2>
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('show')" style="display:none;">
+            <i class="fas fa-bars"></i>
+          </button>
+          <span style="font-size:0.85rem; color:var(--admin-text-light);" id="userDisplay"></span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-cards" id="statsCuotas"></div>
+
+      <!-- Resumen Mensual -->
+      <div class="card-admin" id="resumenMensualCard">
+        <div class="card-admin-header">
+          <h3><i class="fas fa-calendar-check"></i> Resumen de Cobros</h3>
+          <span style="font-size:0.82rem; color:var(--admin-text-light);" id="resumenMesLabel"></span>
+        </div>
+        <div id="resumenMensualContent"></div>
+      </div>
+
+      <!-- INFO PAGOS -->
+      <div class="card-admin" style="border-left:4px solid var(--admin-accent); background:rgba(255,109,0,0.03);">
+        <div style="display:flex; align-items:flex-start; gap:1rem;">
+          <i class="fas fa-calendar-alt" style="font-size:1.5rem; color:var(--admin-accent); margin-top:0.2rem;"></i>
+          <div>
+            <h3 style="font-size:1rem; font-weight:800; text-transform:uppercase; color:var(--admin-text); margin-bottom:0.3rem;">
+              Política de Pagos
+            </h3>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:0.8rem; margin-top:0.8rem;">
+              <div style="background:var(--admin-card); border-radius:8px; padding:0.8rem 1rem; border:1px solid var(--admin-border);">
+                <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--admin-text-light);">Inscripción</span>
+                <p style="font-size:1.1rem; font-weight:800; color:var(--admin-accent); margin:0.2rem 0 0;">${getCRM().cuotas.inscripcion}€</p>
+                <p style="font-size:0.72rem; color:var(--admin-text-light); margin:0;">1er mes (camiseta + seguro)</p>
+              </div>
+              <div style="background:var(--admin-card); border-radius:8px; padding:0.8rem 1rem; border:1px solid var(--admin-border);">
+                <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--admin-text-light);">Mensual</span>
+                <p style="font-size:1.1rem; font-weight:800; color:var(--admin-success); margin:0.2rem 0 0;">${getCRM().cuotas.mensualidadOrdinaria}€</p>
+                <p style="font-size:0.72rem; color:var(--admin-text-light); margin:0;">2º mes en adelante</p>
+              </div>
+              <div style="background:var(--admin-card); border-radius:8px; padding:0.8rem 1rem; border:1px solid var(--admin-border);">
+                <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--admin-text-light);">Pago</span>
+                <p style="font-size:0.85rem; font-weight:700; margin:0.2rem 0 0;">1ra semana del mes</p>
+                <p style="font-size:0.72rem; color:var(--admin-text-light); margin:0;">Días 1-7</p>
+              </div>
+              <div style="background:var(--admin-card); border-radius:8px; padding:0.8rem 1rem; border:1px solid var(--admin-border);">
+                <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--admin-text-light);">Margen</span>
+                <p style="font-size:0.85rem; font-weight:700; color:var(--admin-warning); margin:0.2rem 0 0;">Semana de margen</p>
+                <p style="font-size:0.72rem; color:var(--admin-text-light); margin:0;">Días 8-14 · Si hay torneo, paga antes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOLO GESTOR: Gestión de cuotas, extras y convocatoria -->
+      <div id="gestorControls" style="display:none;">
+        <!-- CONVOCATORIA -->
+        <div class="card-admin">
+          <div class="card-admin-header">
+            <h3><i class="fas fa-bullhorn"></i> Convocatoria de Inscripciones</h3>
+          </div>
+          <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:0.8rem;">
+              <span style="font-size:0.85rem; color:var(--admin-text-light);">Estado actual:</span>
+              <span id="convocatoriaStatus" class="badge badge-success">Abierta</span>
+            </div>
+            <button class="btn-admin" id="toggleConvocatoriaBtn" onclick="toggleConvocatoriaUI()">
+              <i class="fas fa-toggle-on"></i> <span id="convocatoriaBtnText">Cerrar Convocatoria</span>
+            </button>
+            <p style="font-size:0.78rem; color:var(--admin-text-light); margin:0;">
+              <i class="fas fa-info-circle" style="color:var(--admin-accent);"></i> 
+              Cuando la convocatoria está cerrada, no se aceptan nuevas solicitudes de inscripción.
+            </p>
+          </div>
+        </div>
+
+        <!-- EDITAR CUOTAS -->
+        <div class="card-admin">
+          <div class="card-admin-header">
+            <h3><i class="fas fa-euro-sign"></i> Configurar Cuotas</h3>
+          </div>
+          <form class="form-admin" id="cuotasForm" style="max-width:500px;" onsubmit="return false;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <div class="form-group-admin" style="margin:0;">
+                <label>Inscripción (1er mes) €</label>
+                <input type="number" id="cuotaInscripcion" required min="0" step="1">
+              </div>
+              <div class="form-group-admin" style="margin:0;">
+                <label>Mensualidad (2º mes+) €</label>
+                <input type="number" id="cuotaMensualidad" required min="0" step="1">
+              </div>
+            </div>
+            <button type="submit" class="btn-admin btn-primary-admin" onclick="guardarCuotas()">
+              <i class="fas fa-save"></i> Guardar Cuotas
+            </button>
+          </form>
+        </div>
+
+        <!-- PLANES DE CUOTA -->
+        <div class="card-admin">
+          <div class="card-admin-header">
+            <h3><i class="fas fa-layer-group"></i> Planes de Cuota</h3>
+            <span style="font-size:0.78rem; color:var(--admin-text-light);">
+              Define precios base por tipo de socio. Los descuentos se aplican después.
+            </span>
+          </div>
+          <div id="planesList"></div>
+          <form class="form-admin" id="planForm" style="max-width:500px; margin-top:1rem;" onsubmit="return false;">
+            <div style="display:grid; grid-template-columns:2fr 1fr 2fr; gap:0.8rem;">
+              <div class="form-group-admin" style="margin:0;">
+                <label>Nombre del plan</label>
+                <input type="text" id="planNombre" placeholder="Ej: Veterano">
+              </div>
+              <div class="form-group-admin" style="margin:0;">
+                <label>Precio base (€)</label>
+                <input type="number" id="planPrecio" min="0" step="1" placeholder="10">
+              </div>
+              <div class="form-group-admin" style="margin:0;">
+                <label>Descripción</label>
+                <input type="text" id="planDesc" placeholder="Ej: Jugadores veteranos">
+              </div>
+            </div>
+            <button type="submit" class="btn-admin btn-primary-admin" onclick="crearPlan()">
+              <i class="fas fa-plus"></i> Añadir Plan
+            </button>
+          </form>
+        </div>
+
+        <!-- DESCUENTOS -->
+        <div class="card-admin">
+          <div class="card-admin-header">
+            <h3><i class="fas fa-tags"></i> Descuentos</h3>
+          </div>
+          <div id="descuentosList"></div>
+          <form class="form-admin" id="descuentoForm" style="max-width:500px; margin-top:1rem;" onsubmit="return false;">
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:0.8rem;">
+              <div class="form-group-admin" style="margin:0;">
+                <label>Nombre</label>
+                <input type="text" id="descNombre" placeholder="Ej: Familia Numerosa">
+              </div>
+              <div class="form-group-admin" style="margin:0;">
+                <label>Tipo</label>
+                <select id="descTipo">
+                  <option value="porcentaje">% Porcentaje</option>
+                  <option value="fijo">€ Fijo</option>
+                </select>
+              </div>
+              <div class="form-group-admin" style="margin:0;">
+                <label>Valor</label>
+                <input type="number" id="descValor" min="0" step="0.5" placeholder="15">
+              </div>
+            </div>
+            <button type="submit" class="btn-admin btn-primary-admin" onclick="crearDescuento()">
+              <i class="fas fa-plus"></i> Añadir Descuento
+            </button>
+          </form>
+        </div>
+
+        <!-- ASIGNAR PLAN/DESCUENTO A SOCIOS -->
+        <div class="card-admin">
+          <div class="card-admin-header">
+            <h3><i class="fas fa-user-cog"></i> Configurar Socio</h3>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div>
+              <label style="font-size:0.82rem; font-weight:600; display:block; margin-bottom:0.5rem;">Asignar plan a socio:</label>
+              <div style="display:flex; gap:0.5rem;">
+                <select id="asignarPlanMiembro" style="flex:1; padding:0.5rem; border:1px solid var(--admin-border); border-radius:8px; font-family:'Outfit',sans-serif;"></select>
+                <select id="asignarPlanSelect" style="flex:1; padding:0.5rem; border:1px solid var(--admin-border); border-radius:8px; font-family:'Outfit',sans-serif;"></select>
+                <button class="btn-admin btn-primary-admin btn-admin-sm" onclick="asignarPlan()">Asignar</button>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.82rem; font-weight:600; display:block; margin-bottom:0.5rem;">Gestionar descuentos de socio:</label>
+              <div style="display:flex; gap:0.5rem;">
+                <select id="descMiembroSelect" style="flex:1; padding:0.5rem; border:1px solid var(--admin-border); border-radius:8px; font-family:'Outfit',sans-serif;"></select>
+                <select id="descSelect" style="flex:1; padding:0.5rem; border:1px solid var(--admin-border); border-radius:8px; font-family:'Outfit',sans-serif;"></select>
+                <button class="btn-admin btn-success-admin btn-admin-sm" onclick="toggleDescuento()">Toggle</button>
+              </div>
+            </div>
+          </div>
+          <div id="miembroInfo" style="margin-top:1rem; padding:1rem; background:var(--admin-bg); border-radius:8px; display:none;"></div>
+        </div>
+
+        <!-- EXTRAS -->
+        <div class="card-admin">
+          <div class="card-admin-header">
+            <h3><i class="fas fa-plus-circle"></i> Extras (pagos especiales)</h3>
+            <span style="font-size:0.78rem; color:var(--admin-text-light);">
+              <i class="fas fa-info-circle" style="color:var(--admin-accent);"></i> 
+              Crea pagos extraordinarios para justificar gastos importantes o torneos extra
+            </span>
+          </div>
+          <form class="form-admin" id="extraForm" style="max-width:500px;" onsubmit="return false;">
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:1rem;">
+              <div class="form-group-admin" style="margin:0;">
+                <label>Concepto</label>
+                <input type="text" id="extraConcepto" required placeholder="Ej: Torneo extra Costa Dorada">
+              </div>
+              <div class="form-group-admin" style="margin:0;">
+                <label>Importe (€)</label>
+                <input type="number" id="extraImporte" required min="0.01" step="0.01" placeholder="0.00">
+              </div>
+              <div class="form-group-admin" style="margin:0;">
+                <label>Asignar a</label>
+                <select id="extraAsignado">
+                  <option value="todos">Todos los socios</option>
+                  <option value="seleccionar">Seleccionar socios...</option>
+                </select>
+              </div>
+            </div>
+            <div id="extraMiembrosSelect" style="display:none; margin-bottom:1rem;">
+              <p style="font-size:0.78rem; font-weight:600; margin-bottom:0.5rem;">Socios activos:</p>
+              <div id="extraChecklist" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:0.4rem; padding:0.8rem; background:var(--admin-bg); border-radius:8px; max-height:200px; overflow-y:auto;"></div>
+            </div>
+            <button type="submit" class="btn-admin btn-primary-admin" onclick="crearExtra()">
+              <i class="fas fa-plus"></i> Crear Extra
+            </button>
+          </form>
+          <hr style="border-color:var(--admin-border); margin:1.2rem 0;">
+          <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.8rem;">Extras creados</h4>
+          <div id="extrasList"></div>
+        </div>
+      </div>
+
+      <!-- Solicitudes Pendientes -->
+      <div class="card-admin" id="solicitudesCard">
+        <div class="card-admin-header">
+          <h3><i class="fas fa-clock"></i> Solicitudes de Ingreso Pendientes</h3>
+        </div>
+        <div id="solicitudesList"></div>
+      </div>
+
+      <!-- Miembros -->
+      <div class="card-admin">
+        <div class="card-admin-header">
+          <h3><i class="fas fa-list"></i> Socios del Club</h3>
+          <span style="font-size:0.85rem; color:var(--admin-text-light);">
+            Inscripción: <strong>${getCRM().cuotas.inscripcion}€</strong> · 
+            Mensual: <strong>${getCRM().cuotas.mensualidadOrdinaria}€</strong>
+          </span>
+        </div>
+        <div id="miembrosTable"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:var(--admin-success);"></i> <span id="toastMsg">Operación exitosa</span></div>
+
+  <script src="../js/crm-data.js?v=2"></script>
+  <script>
+    const user = getCurrentUser();
+    if (!user) window.location.href = 'login.html';
+    
+    document.getElementById('sidebarUser').innerHTML = `<strong>${user.name}</strong><span class="role-badge">${user.role === 'gestor' ? 'Gestor' : 'Responsable'}</span>`;
+    document.getElementById('userDisplay').textContent = `${user.name} (${user.role})`;
+    
+    // Mostrar controles de gestor
+    if (user.role === 'gestor') {
+      document.getElementById('gestorControls').style.display = 'block';
+    }
+    
+    function initCuotasPage() {
+      const data = getCRM();
+      document.getElementById('cuotaInscripcion').value = data.cuotas.inscripcion;
+      document.getElementById('cuotaMensualidad').value = data.cuotas.mensualidadOrdinaria;
+      renderCuotas();
+    }
+    
+    function renderCuotas() {
+      const data = getCRM();
+      const activos = data.cuotas.miembros.filter(m => m.activo).length;
+      const pendientes = data.cuotas.solicitudesPendientes.filter(s => s.estado === 'pendiente').length;
+      
+      // Morosos: miembros cuyo último pago en flat model no está pagado
+      const morosos = data.cuotas.miembros.filter(m => {
+        const pagosM = getPagosMiembro(m.id);
+        if (pagosM.length === 0) return false;
+        return !pagosM[pagosM.length - 1].pagado;
+      }).length;
+      
+      document.getElementById('statsCuotas').innerHTML = `
+        <div class="stat-card-admin">
+          <div class="stat-icon bg-purple-light"><i class="fas fa-users"></i></div>
+          <div class="stat-number">${activos}</div>
+          <div class="stat-label">Socios Activos</div>
+        </div>
+        <div class="stat-card-admin">
+          <div class="stat-icon bg-orange-light"><i class="fas fa-euro-sign"></i></div>
+          <div class="stat-number">${data.cuotas.inscripcion}€ / ${data.cuotas.mensualidadOrdinaria}€</div>
+          <div class="stat-label">Inscripción / Mensual</div>
+          <div class="stat-sub">${formatEUR(calcularCuotaConDescuentos(data.cuotas.miembros.filter(m=>m.activo)[0]||{}) * activos)}/mes potencial</div>
+        </div>
+        <div class="stat-card-admin">
+          <div class="stat-icon bg-red-light"><i class="fas fa-exclamation-circle"></i></div>
+          <div class="stat-number">${morosos}</div>
+          <div class="stat-label">Morosos</div>
+        </div>
+        <div class="stat-card-admin">
+          <div class="stat-icon bg-blue-light"><i class="fas fa-clock"></i></div>
+          <div class="stat-number">${pendientes}</div>
+          <div class="stat-label">Solicitudes Pendientes</div>
+        </div>
+      `;
+      
+      // Resumen Mensual
+      const mesesPagos = [...new Set(data.cuotas.pagos.map(p => p.mes))].sort();
+      const mesActual = mesesPagos.length > 0 ? mesesPagos[mesesPagos.length - 1] : new Date().toISOString().substring(0,7);
+      const resumen = getResumenMensual(mesActual);
+      document.getElementById('resumenMesLabel').textContent = `Mes: ${getMesNombre(mesActual)} ${mesActual.split('-')[0]}`;
+      document.getElementById('resumenMensualContent').innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:0.8rem; margin-bottom:1rem;">
+          <div style="padding:0.8rem; background:rgba(46,204,113,0.05); border-radius:8px; text-align:center;">
+            <span style="font-size:0.7rem; text-transform:uppercase; font-weight:700; color:var(--admin-text-light);">Esperado</span>
+            <p style="font-size:1.2rem; font-weight:800; margin:0.2rem 0;">${formatEUR(resumen.totalEsperado)}</p>
+          </div>
+          <div style="padding:0.8rem; background:rgba(46,204,113,0.1); border-radius:8px; text-align:center;">
+            <span style="font-size:0.7rem; text-transform:uppercase; font-weight:700; color:var(--admin-text-light);">Cobrado</span>
+            <p style="font-size:1.2rem; font-weight:800; color:var(--admin-success); margin:0.2rem 0;">${formatEUR(resumen.totalPagado)}</p>
+          </div>
+          <div style="padding:0.8rem; background:rgba(231,76,60,0.05); border-radius:8px; text-align:center;">
+            <span style="font-size:0.7rem; text-transform:uppercase; font-weight:700; color:var(--admin-text-light);">Pendiente</span>
+            <p style="font-size:1.2rem; font-weight:800; color:${resumen.totalPendiente > 0 ? 'var(--admin-danger)' : 'var(--admin-success)'}; margin:0.2rem 0;">
+              ${formatEUR(resumen.totalPendiente)}
+            </p>
+          </div>
+          <div style="padding:0.8rem; background:rgba(255,109,0,0.05); border-radius:8px; text-align:center;">
+            <span style="font-size:0.7rem; text-transform:uppercase; font-weight:700; color:var(--admin-text-light);">Recaudación</span>
+            <p style="font-size:1.2rem; font-weight:800; color:var(--admin-accent); margin:0.2rem 0;">${resumen.recaudacion.toFixed(0)}%</p>
+          </div>
+        </div>
+        <!-- Barra de progreso -->
+        <div style="background:var(--admin-border); border-radius:50px; height:6px; overflow:hidden; margin-bottom:0.8rem;">
+          <div style="height:100%; width:${Math.min(resumen.recaudacion,100)}%; background:linear-gradient(90deg, var(--admin-success), var(--admin-accent)); border-radius:50px; transition:width 0.5s;"></div>
+        </div>
+        <div style="font-size:0.8rem;">
+          ${resumen.detalles.filter(d => !d.pagado).slice(0,5).map(d => `
+            <div style="display:flex; justify-content:space-between; padding:0.3rem 0; border-bottom:1px solid var(--admin-border);">
+              <span>${d.miembro.nombre}</span>
+              <span style="font-weight:600; color:var(--admin-danger);">${formatEUR(d.importe)} pendiente</span>
+            </div>
+          `).join('')}
+          ${resumen.totalPendiente > 0 ? `<div style="text-align:center; margin-top:0.5rem;"><a href="#" onclick="event.preventDefault();document.querySelector('#miembrosTable').scrollIntoView({behavior:'smooth'});" style="color:var(--admin-accent); font-weight:600; font-size:0.82rem;">Ver todos los cobros pendientes →</a></div>` : ''}
+        </div>
+      `;
+      
+      // Solicitudes
+      const solicitudes = data.cuotas.solicitudesPendientes.filter(s => s.estado === 'pendiente');
+      document.getElementById('solicitudesList').innerHTML = solicitudes.length === 0 
+        ? '<p style="color:var(--admin-text-light);">No hay solicitudes pendientes</p>'
+        : solicitudes.map(s => `
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:0.8rem 0; border-bottom:1px solid var(--admin-border);">
+            <div>
+              <p style="font-weight:600;">${s.nombre}</p>
+              <p style="font-size:0.8rem; color:var(--admin-text-light);">${s.email || ''} | ${s.telefono || ''} | ${s.categoria || 'Solicitante'}</p>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn-admin btn-success-admin btn-admin-sm" onclick="aprobarSocio(${s.id}); renderCuotas(); toastMsg('Socio aprobado');">
+                <i class="fas fa-check"></i> Aprobar
+              </button>
+              <button class="btn-admin btn-danger-admin btn-admin-sm" onclick="rechazarSocio(${s.id}); renderCuotas(); toastMsg('Solicitud rechazada');">
+                <i class="fas fa-times"></i> Rechazar
+              </button>
+            </div>
+          </div>
+        `).join('');
+      
+      // Miembros - Usar flat pagos model
+      const miembros = data.cuotas.miembros;
+      
+      // Obtener últimos 3 meses únicos de todos los pagos
+      const mesesUnicos = [...new Set(data.cuotas.pagos.map(p => p.mes))].sort().slice(-3);
+      
+      document.getElementById('miembrosTable').innerHTML = `
+        <table class="table-admin">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Posición</th>
+              <th>Estado</th>
+              ${mesesUnicos.map(m => `<th>${getMesNombre(m)}</th>`).join('')}
+              <th>Imp.</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${miembros.filter(m => m.activo).map(m => {
+              const pagosM = getPagosMiembro(m.id);
+              const ultPagos = mesesUnicos.map(mes => pagosM.find(p => p.mes === mes)).filter(Boolean);
+              const ultPago = ultPagos.length > 0 ? ultPagos[ultPagos.length - 1] : null;
+              const mesUlt = ultPago ? ultPago.mes : null;
+              const importe = mesUlt ? getCuotaMensual(m, mesUlt) : data.cuotas.inscripcion;
+              
+              return `
+                <tr>
+                  <td style="font-weight:600;">${m.nombre}</td>
+                  <td>${m.posicion || m.categoria || '-'}</td>
+                  <td><span class="badge ${m.activo ? 'badge-success' : 'badge-danger'}">${m.activo ? 'Activo' : 'Inactivo'}</span></td>
+                  ${mesesUnicos.map(mes => {
+                    const p = pagosM.find(p => p.mes === mes);
+                    const pagado = p ? p.pagado : false;
+                    return `
+                      <td style="text-align:center;">
+                        <span style="color:${pagado ? 'var(--admin-success)' : 'var(--admin-danger)'}; font-size:1.1rem;">
+                          ${pagado ? '✓' : '✗'}
+                        </span>
+                      </td>
+                    `;
+                  }).join('')}
+                  <td style="text-align:center; font-weight:700; color:var(--admin-accent);">
+                    ${importe}€
+                  </td>
+                  <td>
+                    ${ultPago && !ultPago.pagado ? `
+                      <button class="btn-admin btn-success-admin btn-admin-sm" onclick="registrarPago(${m.id}, '${mesUlt}'); renderCuotas(); toastMsg('Pago registrado (${importe}€)');">
+                        Cobrar ${importe}€
+                      </button>
+                    ` : '<span style="font-size:0.8rem; color:var(--admin-text-light);">Al día</span>'}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+      
+      // Render extras si es gestor
+      if (user.role === 'gestor') {
+        renderExtras();
+        renderConvocatoria();
+      }
+    }
+    
+    // ===== CONVOCATORIA =====
+    function renderConvocatoria() {
+      const data = getCRM();
+      const abierta = data.cuotas.convocatoriaAbierta;
+      document.getElementById('convocatoriaStatus').textContent = abierta ? 'Abierta' : 'Cerrada';
+      document.getElementById('convocatoriaStatus').className = `badge ${abierta ? 'badge-success' : 'badge-danger'}`;
+      document.getElementById('convocatoriaBtnText').textContent = abierta ? 'Cerrar Convocatoria' : 'Abrir Convocatoria';
+    }
+    
+    function toggleConvocatoriaUI() {
+      const result = toggleConvocatoria();
+      if (result.success) {
+        renderConvocatoria();
+        toastMsg(`Convocatoria ${result.abierta ? 'abierta' : 'cerrada'}`);
+      }
+    }
+    
+    // ===== CUOTAS =====
+    function guardarCuotas() {
+      const insc = parseFloat(document.getElementById('cuotaInscripcion').value);
+      const mens = parseFloat(document.getElementById('cuotaMensualidad').value);
+      if (!insc || !mens || insc < 0 || mens < 0) {
+        alert('Introduce valores válidos');
+        return;
+      }
+      const result = actualizarCuotas(insc, mens);
+      if (result.success) {
+        renderCuotas();
+        toastMsg('Cuotas actualizadas correctamente');
+      }
+    }
+    
+    // ===== EXTRAS =====
+    function renderExtras() {
+      const extras = getExtras();
+      const container = document.getElementById('extrasList');
+      
+      // Siempre rellenar checklist
+      renderExtraChecklist();
+      
+      if (extras.length === 0) {
+        container.innerHTML = '<p style="color:var(--admin-text-light);">No hay extras creados</p>';
+        return;
+      }
+      container.innerHTML = `
+        <table class="table-admin">
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Importe</th>
+              <th>Fecha</th>
+              <th>Asignado</th>
+              <th>Recaudado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${extras.map(e => {
+              const pagos = getPagosExtras().filter(p => p.extraId === e.id);
+              const pagados = pagos.filter(p => p.pagado).length;
+              const total = pagos.length;
+              const recaudado = pagos.filter(p => p.pagado).reduce((sum, p) => sum + e.importe, 0);
+              return `
+                <tr>
+                  <td style="font-weight:600;">${e.concepto}</td>
+                  <td style="font-weight:700; color:var(--admin-accent);">${formatEUR(e.importe)}</td>
+                  <td>${formatDateCRM(e.fecha)}</td>
+                  <td>${e.asignadoA === 'todos' ? 'Todos los socios' : 'Seleccionados'}</td>
+                  <td>${pagados}/${total} (${formatEUR(recaudado)})</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function renderExtraChecklist() {
+      const data = getCRM();
+      const container = document.getElementById('extraChecklist');
+      container.innerHTML = data.cuotas.miembros.filter(m => m.activo).map(m => `
+        <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; cursor:pointer;">
+          <input type="checkbox" class="extra-miembro-cb" value="${m.id}" checked>
+          ${m.nombre}
+        </label>
+      `).join('');
+    }
+    
+    document.getElementById('extraAsignado').addEventListener('change', function() {
+      document.getElementById('extraMiembrosSelect').style.display = this.value === 'seleccionar' ? 'block' : 'none';
+    });
+    
+    function crearExtra() {
+      const concepto = document.getElementById('extraConcepto').value.trim();
+      const importe = parseFloat(document.getElementById('extraImporte').value);
+      const asignado = document.getElementById('extraAsignado').value;
+      
+      if (!concepto || !importe || importe <= 0) {
+        alert('Rellena el concepto y el importe');
+        return;
+      }
+      
+      let asignadoA = 'todos';
+      if (asignado === 'seleccionar') {
+        const cbs = document.querySelectorAll('.extra-miembro-cb:checked');
+        if (cbs.length === 0) {
+          alert('Selecciona al menos un socio');
+          return;
+        }
+        asignadoA = Array.from(cbs).map(cb => parseInt(cb.value));
+      }
+      
+      const result = addExtra(concepto, importe, asignadoA, user.name);
+      if (result.success) {
+        document.getElementById('extraConcepto').value = '';
+        document.getElementById('extraImporte').value = '';
+        renderCuotas();
+        toastMsg('Extra creado correctamente');
+      }
+    }
+    
+    function toastMsg(msg) {
+      document.getElementById('toastMsg').textContent = msg;
+      document.getElementById('toast').classList.add('show');
+      setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000);
+    }
+    
+    // ===== PLANES DE CUOTA =====
+    function renderPlanes() {
+      const data = getCRM();
+      const planes = data.cuotas.planes || [];
+      const container = document.getElementById('planesList');
+      
+      // Rellenar selects de asignación
+      const planSelect = document.getElementById('asignarPlanSelect');
+      planSelect.innerHTML = planes.map(p => `<option value="${p.id}">${p.nombre} (${p.precioBase}€)</option>`).join('');
+      
+      if (planes.length === 0) {
+        container.innerHTML = '<p style="color:var(--admin-text-light);">No hay planes definidos</p>';
+        return;
+      }
+      container.innerHTML = `
+        <table class="table-admin">
+          <thead><tr><th>Plan</th><th>Precio Base</th><th>Descripción</th><th>Socios</th><th></th></tr></thead>
+          <tbody>
+            ${planes.map(p => {
+              const socios = data.cuotas.miembros.filter(m => m.planId === p.id).length;
+              return `<tr>
+                <td style="font-weight:600;">${p.nombre}</td>
+                <td>${formatEUR(p.precioBase)}</td>
+                <td style="font-size:0.82rem;color:var(--admin-text-light);">${p.descripcion || ''}</td>
+                <td>${socios} socios</td>
+                <td><button class="btn-admin btn-danger-admin btn-admin-sm" onclick="eliminarPlan('${p.id}')"><i class="fas fa-trash"></i></button></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function crearPlan() {
+      const nombre = document.getElementById('planNombre').value.trim();
+      const precio = parseFloat(document.getElementById('planPrecio').value);
+      const desc = document.getElementById('planDesc').value.trim();
+      if (!nombre || !precio) { alert('Nombre y precio requeridos'); return; }
+      const data = getCRM();
+      const id = nombre.toLowerCase().replace(/[^a-z0-9]/g,'');
+      if (!data.cuotas.planes) data.cuotas.planes = [];
+      data.cuotas.planes.push({ id, nombre, precioBase: precio, descripcion: desc });
+      saveCRM(data);
+      document.getElementById('planNombre').value = '';
+      document.getElementById('planPrecio').value = '';
+      document.getElementById('planDesc').value = '';
+      renderPlanes();
+      renderCuotas();
+      toastMsg(`Plan "${nombre}" creado`);
+    }
+    
+    function eliminarPlan(id) {
+      const data = getCRM();
+      data.cuotas.planes = (data.cuotas.planes || []).filter(p => p.id !== id);
+      data.cuotas.miembros.forEach(m => { if (m.planId === id) m.planId = 'jugador'; });
+      saveCRM(data);
+      renderPlanes();
+      renderCuotas();
+      toastMsg('Plan eliminado');
+    }
+    
+    function asignarPlan() {
+      const miembroId = parseInt(document.getElementById('asignarPlanMiembro').value);
+      const planId = document.getElementById('asignarPlanSelect').value;
+      const data = getCRM();
+      const m = data.cuotas.miembros.find(m => m.id === miembroId);
+      if (m) { m.planId = planId; saveCRM(data); renderCuotas(); toastMsg('Plan asignado'); }
+    }
+    
+    // ===== DESCUENTOS =====
+    function renderDescuentos() {
+      const data = getCRM();
+      const descuentos = data.cuotas.descuentos || [];
+      const container = document.getElementById('descuentosList');
+      const descSelect = document.getElementById('descSelect');
+      descSelect.innerHTML = descuentos.map(d => `<option value="${d.id}">${d.nombre} (${d.tipo === 'porcentaje' ? d.valor+'%' : d.valor+'€'})</option>`).join('');
+      
+      if (descuentos.length === 0) {
+        container.innerHTML = '<p style="color:var(--admin-text-light);">No hay descuentos definidos</p>';
+        return;
+      }
+      container.innerHTML = `
+        <table class="table-admin">
+          <thead><tr><th>Descuento</th><th>Tipo</th><th>Valor</th><th></th></tr></thead>
+          <tbody>
+            ${descuentos.map(d => `<tr>
+              <td style="font-weight:600;">${d.nombre}</td>
+              <td>${d.tipo === 'porcentaje' ? '% Porcentaje' : '€ Fijo'}</td>
+              <td>${d.tipo === 'porcentaje' ? d.valor+'%' : formatEUR(d.valor)}</td>
+              <td><button class="btn-admin btn-danger-admin btn-admin-sm" onclick="eliminarDescuento(${d.id})"><i class="fas fa-trash"></i></button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function crearDescuento() {
+      const nombre = document.getElementById('descNombre').value.trim();
+      const tipo = document.getElementById('descTipo').value;
+      const valor = parseFloat(document.getElementById('descValor').value);
+      if (!nombre || !valor) { alert('Nombre y valor requeridos'); return; }
+      const data = getCRM();
+      if (!data.cuotas.descuentos) data.cuotas.descuentos = [];
+      const id = (data.cuotas.descuentos.length + 1);
+      data.cuotas.descuentos.push({ id, nombre, tipo, valor, aplicaA: 'todos' });
+      saveCRM(data);
+      document.getElementById('descNombre').value = '';
+      document.getElementById('descValor').value = '';
+      renderDescuentos();
+      toastMsg(`Descuento "${nombre}" creado`);
+    }
+    
+    function eliminarDescuento(id) {
+      const data = getCRM();
+      data.cuotas.descuentos = (data.cuotas.descuentos || []).filter(d => d.id !== id);
+      data.cuotas.miembros.forEach(m => {
+        if (m.descuentos) m.descuentos = m.descuentos.filter(d => d !== id);
+      });
+      saveCRM(data);
+      renderDescuentos();
+      renderCuotas();
+      toastMsg('Descuento eliminado');
+    }
+    
+    function toggleDescuento() {
+      const miembroId = parseInt(document.getElementById('descMiembroSelect').value);
+      const descId = parseInt(document.getElementById('descSelect').value);
+      const data = getCRM();
+      const m = data.cuotas.miembros.find(m => m.id === miembroId);
+      if (!m) return;
+      if (!m.descuentos) m.descuentos = [];
+      const idx = m.descuentos.indexOf(descId);
+      if (idx === -1) m.descuentos.push(descId);
+      else m.descuentos.splice(idx, 1);
+      saveCRM(data);
+      actualizarInfoSocio(miembroId);
+      renderCuotas();
+      toastMsg('Descuento actualizado');
+    }
+    
+    function actualizarInfoSocio(miembroId) {
+      const data = getCRM();
+      const m = data.cuotas.miembros.find(m => m.id === miembroId);
+      if (!m) return;
+      const info = document.getElementById('miembroInfo');
+      info.style.display = 'block';
+      const planInfo = getPlanInfo(m);
+      const cuotaFinal = calcularCuotaConDescuentos(m);
+      const descs = (m.descuentos || []).map(dId => {
+        const d = (data.cuotas.descuentos || []).find(d => d.id === dId);
+        return d ? d.nombre : '';
+      }).filter(Boolean).join(', ') || 'Ninguno';
+      info.innerHTML = `
+        <p style="font-weight:700; margin-bottom:0.5rem;">${m.nombre}</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.8rem; font-size:0.85rem;">
+          <div><strong>Plan:</strong> ${planInfo.nombre} (${formatEUR(planInfo.precioBase)})</div>
+          <div><strong>Descuentos:</strong> ${descs}</div>
+          <div style="font-weight:800; color:var(--admin-accent);"><strong>Cuota final:</strong> ${formatEUR(cuotaFinal)}/mes</div>
+        </div>
+      `;
+    }
+    
+    function rellenarSelectoresSocios() {
+      const data = getCRM();
+      const miembros = data.cuotas.miembros.filter(m => m.activo);
+      const selects = ['asignarPlanMiembro', 'descMiembroSelect'];
+      selects.forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        sel.innerHTML = miembros.map(m => `<option value="${m.id}">${m.nombre}</option>`).join('');
+        sel.onchange = () => actualizarInfoSocio(parseInt(sel.value));
+      });
+      if (miembros.length > 0) actualizarInfoSocio(miembros[0].id);
+    }
+    
+    // Modificar renderCuotas para incluir planes y descuentos
+    const originalRenderCuotas = renderCuotas;
+    renderCuotas = function() {
+      originalRenderCuotas();
+      if (user.role === 'gestor') {
+        renderPlanes();
+        renderDescuentos();
+        rellenarSelectoresSocios();
+      }
+    };
+    
+    initCuotasPage();
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Voley Club La Placeta</title>
+  <desc id="desc">Escudo moderno del Voley Club La Placeta en morado, naranja y blanco.</desc>
+  <path d="M110 10L188 42V105C188 151 157 190 110 210C63 190 32 151 32 105V42L110 10Z" fill="#3f00d8"/>
+  <path d="M110 23L176 50V105C176 143 150 177 110 195C70 177 44 143 44 105V50L110 23Z" stroke="#ff751f" stroke-width="8"/>
+  <path d="M70 95C79 63 107 45 140 52C118 63 100 81 92 110C87 128 89 146 96 163C73 149 62 121 70 95Z" fill="#ffffff"/>
+  <path d="M96 57C118 55 140 67 151 88C127 85 105 96 90 116C87 94 89 74 96 57Z" fill="#ff751f"/>
+  <path d="M101 165C94 140 101 114 121 96C134 85 150 81 166 83C164 110 150 135 127 151C119 157 110 162 101 165Z" fill="#ffffff"/>
+  <path d="M77 176H143" stroke="#ff751f" stroke-width="7" stroke-linecap="round"/>
+  <text x="110" y="137" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="34" font-weight="900" fill="#3f00d8">VCLP</text>
+</svg>
