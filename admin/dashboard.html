@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' http://localhost:3000;">
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -36,6 +37,7 @@
       </div>
       <div class="sidebar-footer">
         <a href="../index.html"><i class="fas fa-external-link-alt"></i> Ver web pública</a>
+        <div class="security-badge" style="margin-top:0.5rem;"><i class="fas fa-shield-alt"></i> Conexión segura</div>
       </div>
     </nav>
     <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); document.querySelector('.sidebar-overlay').classList.remove('show')"></div>

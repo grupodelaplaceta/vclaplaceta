@@ -1,6 +1,30 @@
 /* ========================================
    CRM ADMIN - VOLEY CLUB LA PLACETA
+   Gestión segura y profesional
    ======================================== */
+
+/* Seguridad: evitar selección de credenciales */
+input[type="password"] {
+  -webkit-text-security: disc;
+}
+
+/* SSL / Seguridad visual */
+.security-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.4);
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Evitar XSS en outputs */
+.card-admin, .table-admin td, .stat-card-admin {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
 
 :root {
   --admin-bg: #f0eef6;
