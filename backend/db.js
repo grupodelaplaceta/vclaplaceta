@@ -21,8 +21,6 @@ async function connectDB() {
     await mongoDb.command({ ping: 1 });
     useMongo = true;
     console.log('✅ Conectado a MongoDB Atlas');
-    const count = await mongoDb.collection('users').countDocuments();
-    if (count === 0) await seedMongo(mongoDb);
     return mongoDb;
   } catch (err) {
     console.log('⚠️ MongoDB no disponible, usando JSON:', err.message);
