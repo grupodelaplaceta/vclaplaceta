@@ -52,125 +52,44 @@ const CRM_DEFAULT = {
         { id: 6, nombre: 'Otros', presupuesto: 1500, gastado: 0 }
       ]
     },
-    // Proyectos bloqueados por el Gestor (seguros, equipación...)
-    // Estos fondos no se pueden gastar en torneos hasta que se paguen
-    proyectosBloqueados: [
-      { id: 1, nombre: 'Seguro anual 2026', cantidad: 2400, fechaBloqueo: '2026-01-15', estado: 'bloqueado', creadoPor: 'gestor' },
-      { id: 2, nombre: 'Equipación temporada', cantidad: 1800, fechaBloqueo: '2026-02-01', estado: 'bloqueado', creadoPor: 'gestor' }
-    ],
+    proyectosBloqueados: [],
     historial: [
-      { id: 1, fecha: '2026-01-15', concepto: 'Aportación inicial Junta', tipo: 'ingreso', cantidad: 15000, categoria: 'aportacion', registradoPor: 'gestor' },
-      { id: 2, fecha: '2026-02-01', concepto: 'Pago cuotas enero', tipo: 'ingreso', cantidad: 3200, categoria: 'cuotas', registradoPor: 'gestor' },
-      { id: 3, fecha: '2026-02-15', concepto: 'Inscripción Superliga Estatal', tipo: 'gasto', cantidad: -2500, categoria: 'torneo', registradoPor: 'responsable' },
-      { id: 4, fecha: '2026-03-01', concepto: 'Pago cuotas febrero', tipo: 'ingreso', cantidad: 3100, categoria: 'cuotas', registradoPor: 'gestor' },
-      { id: 5, fecha: '2026-03-10', concepto: 'Material deportivo', tipo: 'gasto', cantidad: -800, categoria: 'material', registradoPor: 'responsable' },
-      { id: 6, fecha: '2026-04-01', concepto: 'Pago cuotas marzo', tipo: 'ingreso', cantidad: 2900, categoria: 'cuotas', registradoPor: 'gestor' },
-      { id: 7, fecha: '2026-04-20', concepto: 'Transporte torneo Valencia', tipo: 'gasto', cantidad: -1200, categoria: 'transporte', registradoPor: 'responsable' },
-      { id: 8, fecha: '2026-05-01', concepto: 'Pago cuotas abril', tipo: 'ingreso', cantidad: 2800, categoria: 'cuotas', registradoPor: 'gestor' }
+      { id: 1, fecha: '2026-01-15', concepto: 'Aportación inicial Junta', tipo: 'ingreso', cantidad: 15000, categoria: 'aportacion', registradoPor: 'gestor' }
     ]
   },
-  // CUOTAS - Socios del club
-  // SISTEMA AVANZADO:
-  // - Planes de cuota: cada socio tiene un plan con precio base
-  // - Descuentos: familia numerosa, estudiante, etc.
-  // - Recargos: pago tardío (+2€)
-  // - Historial detallado por socio
+  // CUOTAS - Sistema simplificado
   cuotas: {
     inscripcion: 35,
     mensualidadOrdinaria: 10,
     convocatoriaAbierta: true,
-    planes: [
-      { id: 'jugador', nombre: 'Jugador Titular', precioBase: 10, descripcion: 'Jugadores del primer equipo' },
-      { id: 'suplente', nombre: 'Jugador Suplente', precioBase: 8, descripcion: 'Jugadores de reserva' },
-      { id: 'colaborador', nombre: 'Colaborador', precioBase: 5, descripcion: 'Miembros de apoyo' }
+    modalidades: [
+      { id: 'mensual', nombre: 'Mensual', meses: 1, factor: 1.0, descripcion: 'Pago cada mes' }
     ],
-    descuentos: [
-      { id: 1, nombre: 'Familia Numerosa', tipo: 'porcentaje', valor: 15, aplicaA: 'todos' },
-      { id: 2, nombre: 'Estudiante', tipo: 'fijo', valor: 2, aplicaA: 'todos' }
-    ],
-    extras: [
-      { id: 1, concepto: 'Cena fin de temporada', importe: 15, fecha: '2026-06-01', asignadoA: 'todos', creadoPor: 'gestor' }
-    ],
-    pagosExtras: [
-      { id: 1, extraId: 1, miembroId: 1, pagado: true, fechaPago: '2026-06-05' },
-      { id: 2, extraId: 1, miembroId: 2, pagado: false, fechaPago: null }
-    ],
-    pagos: [
-      { id: 1, miembroId: 1, mes: '2026-01', importe: 10, pagado: true, fechaPago: '2026-01-05', registradoPor: 'gestor' },
-      { id: 2, miembroId: 2, mes: '2026-01', importe: 10, pagado: true, fechaPago: '2026-01-10', registradoPor: 'gestor' },
-      { id: 3, miembroId: 3, mes: '2026-01', importe: 35, pagado: true, fechaPago: '2026-01-12', registradoPor: 'gestor' },
-      { id: 4, miembroId: 4, mes: '2026-01', importe: 10, pagado: true, fechaPago: '2026-01-03', registradoPor: 'gestor' },
-      { id: 5, miembroId: 5, mes: '2026-01', importe: 10, pagado: true, fechaPago: '2026-01-15', registradoPor: 'gestor' },
-      { id: 6, miembroId: 6, mes: '2026-01', importe: 35, pagado: true, fechaPago: '2026-01-20', registradoPor: 'gestor' },
-      { id: 7, miembroId: 1, mes: '2026-02', importe: 10, pagado: true, fechaPago: '2026-02-03', registradoPor: 'gestor' },
-      { id: 8, miembroId: 2, mes: '2026-02', importe: 10, pagado: true, fechaPago: '2026-02-08', registradoPor: 'gestor' },
-      { id: 9, miembroId: 3, mes: '2026-02', importe: 10, pagado: true, fechaPago: '2026-02-10', registradoPor: 'gestor' },
-      { id: 10, miembroId: 4, mes: '2026-02', importe: 10, pagado: true, fechaPago: '2026-02-05', registradoPor: 'gestor' },
-      { id: 11, miembroId: 5, mes: '2026-02', importe: 10, pagado: true, fechaPago: '2026-02-14', registradoPor: 'gestor' },
-      { id: 12, miembroId: 6, mes: '2026-02', importe: 10, pagado: true, fechaPago: '2026-02-18', registradoPor: 'gestor' },
-      { id: 13, miembroId: 1, mes: '2026-03', importe: 10, pagado: true, fechaPago: '2026-03-07', registradoPor: 'gestor' },
-      { id: 14, miembroId: 3, mes: '2026-03', importe: 10, pagado: true, fechaPago: '2026-03-05', registradoPor: 'gestor' },
-      { id: 15, miembroId: 4, mes: '2026-03', importe: 10, pagado: true, fechaPago: '2026-03-02', registradoPor: 'gestor' },
-      { id: 16, miembroId: 5, mes: '2026-03', importe: 10, pagado: true, fechaPago: '2026-03-10', registradoPor: 'gestor' },
-      { id: 17, miembroId: 6, mes: '2026-03', importe: 10, pagado: true, fechaPago: '2026-03-15', registradoPor: 'gestor' },
-      { id: 18, miembroId: 1, mes: '2026-04', importe: 10, pagado: true, fechaPago: '2026-04-04', registradoPor: 'gestor' },
-      { id: 19, miembroId: 2, mes: '2026-04', importe: 10, pagado: true, fechaPago: '2026-04-12', registradoPor: 'gestor' },
-      { id: 20, miembroId: 3, mes: '2026-04', importe: 10, pagado: true, fechaPago: '2026-04-08', registradoPor: 'gestor' },
-      { id: 21, miembroId: 4, mes: '2026-04', importe: 10, pagado: true, fechaPago: '2026-04-01', registradoPor: 'gestor' },
-      { id: 22, miembroId: 6, mes: '2026-04', importe: 10, pagado: true, fechaPago: '2026-04-18', registradoPor: 'gestor' }
-    ],
+    pagos: [],
     miembros: [
-      { id: 1, nombre: 'David Hernández', email: 'david@email.com', telefono: '612345678', posicion: 'Líbero', esSuplente: false, esResponsable: true, planId: 'jugador', descuentos: [], cuotaPersonalizada: null, fechaAlta: '2025-09-01', activo: true },
-      { id: 2, nombre: 'Javier Robles', email: 'javier@email.com', telefono: '623456789', posicion: 'Colocador', esSuplente: false, esResponsable: false, planId: 'jugador', descuentos: [], cuotaPersonalizada: null, fechaAlta: '2025-09-01', activo: true },
-      { id: 3, nombre: 'Miguel Torres', email: 'miguel@email.com', telefono: '634567890', posicion: 'Central', esSuplente: false, esResponsable: false, planId: 'jugador', descuentos: [1], cuotaPersonalizada: null, fechaAlta: '2025-09-15', activo: true },
-      { id: 4, nombre: 'Sofía García', email: 'sofia@email.com', telefono: '645678901', posicion: 'Colocadora', esSuplente: false, esResponsable: false, planId: 'jugador', descuentos: [], cuotaPersonalizada: null, fechaAlta: '2025-09-01', activo: true },
-      { id: 5, nombre: 'Alejandra López', email: 'alejandra@email.com', telefono: '656789012', posicion: 'Central', esSuplente: true, esResponsable: false, planId: 'suplente', descuentos: [2], cuotaPersonalizada: null, fechaAlta: '2025-10-01', activo: true },
-      { id: 6, nombre: 'Raúl Jiménez', email: 'raul@email.com', telefono: '667890123', posicion: 'Receptor', esSuplente: true, esResponsable: false, planId: 'suplente', descuentos: [], cuotaPersonalizada: null, fechaAlta: '2026-01-15', activo: true }
+      { id: 1, nombre: 'David Hernández', email: 'david@email.com', telefono: '612345678', posicion: 'Líbero', modalidadId: 'mensual', cuotaPersonalizada: null, fechaAlta: '2026-01-01', activo: true },
+      { id: 2, nombre: 'Javier Robles', email: 'javier@email.com', telefono: '623456789', posicion: 'Colocador', modalidadId: 'mensual', cuotaPersonalizada: null, fechaAlta: '2026-01-01', activo: true },
+      { id: 3, nombre: 'Miguel Torres', email: 'miguel@email.com', telefono: '634567890', posicion: 'Central', modalidadId: 'mensual', cuotaPersonalizada: null, fechaAlta: '2026-01-15', activo: true },
+      { id: 4, nombre: 'Sofía García', email: 'sofia@email.com', telefono: '645678901', posicion: 'Colocadora', modalidadId: 'mensual', cuotaPersonalizada: null, fechaAlta: '2026-01-01', activo: true },
+      { id: 5, nombre: 'Alejandra López', email: 'alejandra@email.com', telefono: '656789012', posicion: 'Central', modalidadId: 'mensual', cuotaPersonalizada: null, fechaAlta: '2026-02-01', activo: true },
+      { id: 6, nombre: 'Raúl Jiménez', email: 'raul@email.com', telefono: '667890123', posicion: 'Receptor', modalidadId: 'mensual', cuotaPersonalizada: null, fechaAlta: '2026-02-15', activo: true }
     ],
-    solicitudesPendientes: [
-      { id: 1, nombre: 'Lucía Pérez', email: 'lucia@email.com', telefono: '678901234', fechaSolicitud: '2026-05-10', estado: 'pendiente' },
-      { id: 2, nombre: 'Marcos Ruiz', email: 'marcos@email.com', telefono: '689012345', fechaSolicitud: '2026-05-12', estado: 'pendiente' }
-    ]
+    solicitudesPendientes: []
   },
   // TORNEOS - Inscripciones
   torneos: {
-    inscripciones: [
-      { id: 1, nombre: 'Superliga Estatal', fecha: '2026-02-15', jugadoresAsistentes: [1,2,3,4,5,6], precioPorJugador: 50, estado: 'inscrito', aprobadoPor: 'gestor' },
-      { id: 2, nombre: 'Liga Regional', fecha: '2026-03-20', jugadoresAsistentes: [1,2,3,4,5,6,7], precioPorJugador: 45, estado: 'inscrito', aprobadoPor: 'gestor' },
-      { id: 3, nombre: 'Torneo Amistoso', fecha: '2026-07-05', jugadoresAsistentes: [1,2,3,4,5], precioPorJugador: 60, estado: 'pendiente', solicitadoPor: 'responsable', aprobadoPor: null }
-    ]
+    inscripciones: []
   },
-  // PARTIDOS - Historial desde CRM
-  partidos: [
-    { id: 1, fecha: '2026-05-15', hora: '20:30', torneo: 'Superliga Estatal', local: 'Voley Club La Placeta', visitante: 'CV Tarragona', setsLocal: 3, setsVisitante: 1, resultado: 'Victoria' },
-    { id: 2, fecha: '2026-05-08', hora: '19:00', torneo: 'Liga Regional', local: 'Reus Voleibol', visitante: 'Voley Club La Placeta', setsLocal: 2, setsVisitante: 3, resultado: 'Victoria' },
-    { id: 3, fecha: '2026-04-28', hora: '18:00', torneo: 'Liga Regional', local: 'Voley Club La Placeta', visitante: 'CV Tarragona', setsLocal: 3, setsVisitante: 0, resultado: 'Victoria' },
-    { id: 4, fecha: '2026-04-15', hora: '20:30', torneo: 'Superliga Estatal', local: 'Gigantes Voleibol', visitante: 'Voley Club La Placeta', setsLocal: 3, setsVisitante: 2, resultado: 'Derrota' },
-    { id: 5, fecha: '2026-04-05', hora: '19:00', torneo: 'Superliga Estatal', local: 'Voley Club La Placeta', visitante: 'Deportivo Terrassa', setsLocal: 3, setsVisitante: 1, resultado: 'Victoria' },
-    { id: 6, fecha: '2026-03-22', hora: '18:00', torneo: 'Liga Regional', local: 'CV Tarragona', visitante: 'Voley Club La Placeta', setsLocal: 0, setsVisitante: 3, resultado: 'Victoria' },
-    { id: 7, fecha: '2026-03-10', hora: '20:30', torneo: 'Superliga Estatal', local: 'Voley Club La Placeta', visitante: 'Potencia Valencia', setsLocal: 2, setsVisitante: 3, resultado: 'Derrota' }
-  ],
-  // PATROCINIOS - Solicitudes desde la web
-  patrocinios: [
-    { id: 1, empresa: 'Ejemplo SL', contacto: 'info@ejemplo.com', telefono: '612345678', mensaje: 'Queremos patrocinar', fecha: '2026-06-01', estado: 'pendiente' }
-  ],
-  // NOTICIAS - Gestionadas desde CRM, visibles en web
-  noticias: [
-    { id: 1, fecha: '2026-06-15', titulo: '¡Victoria en casa! VCPL vence al CV Tarragona', resumen: 'Nuestro equipo se impuso por 3-0 en un partido intenso.', contenido: 'Gran actuación del equipo.', categoria: 'Partidos', destacada: true },
-    { id: 2, fecha: '2026-06-10', titulo: 'Abiertas inscripciones para la temporada 2026-2027', resumen: 'Ya puedes apuntarte para formar parte del club.', contenido: 'Ampliamos plantilla.', categoria: 'Convocatoria', destacada: true },
-    { id: 3, fecha: '2026-06-05', titulo: 'Nueva equipación presentada', resumen: 'Estrenamos imagen para la nueva temporada.', contenido: 'Diseño renovado.', categoria: 'Club', destacada: true }
-  ],
-  // REVISIONES - Auditoría
-  revisiones: [
-    { id: 1, fecha: '2026-01-05', usuario: 'gestor', accion: 'Pago registrado', detalle: 'David Hernández - Enero 2026 - 10€' },
-    { id: 2, fecha: '2026-02-15', usuario: 'responsable', accion: 'Torneo solicitado', detalle: 'Superliga Estatal - 6 jugs × 50€ = 300€' },
-    { id: 3, fecha: '2026-02-16', usuario: 'gestor', accion: 'Torneo aprobado', detalle: 'Superliga Estatal - Aprobado' },
-    { id: 4, fecha: '2026-03-01', usuario: 'gestor', accion: 'Proyecto bloqueado', detalle: 'Seguro anual 2026 - 2.400€' }
-  ],
+  // PARTIDOS
+  partidos: [],
+  // PATROCINIOS
+  patrocinios: [],
+  // NOTICIAS
+  noticias: [],
+  // REVISIONES
+  revisiones: [],
   // NOTIFICACIONES
-  notificaciones: [
-    { id: 1, fecha: '2026-05-15', mensaje: 'Solicitud de inscripción a Torneo Internacional Costa Dorada (3.500€ - FUERA DE PRESUPUESTO)', tipo: 'solicitud', leida: false, url: 'admin-torneos.html' },
-    { id: 2, fecha: '2026-05-12', mensaje: 'Nueva solicitud de socio: Marcos Ruiz', tipo: 'socio', leida: false, url: 'admin-cuotas.html' },
+  notificaciones: [],
     { id: 3, fecha: '2026-05-10', mensaje: 'Nueva solicitud de socio: Lucía Pérez', tipo: 'socio', leida: true, url: 'admin-cuotas.html' },
     { id: 4, fecha: '2026-05-08', mensaje: 'Presupuesto de temporada al 63% - Revisar gastos', tipo: 'alerta', leida: false, url: 'admin-finanzas.html' }
   ]
@@ -191,16 +110,15 @@ function initCRM() {
   
   const data = JSON.parse(stored);
   
-  // Migración: asegurar que existen los nuevos campos
-  if (!data.cuotas.extras) {
-    data.cuotas.extras = CRM_DEFAULT.cuotas.extras;
-  }
-  if (!data.cuotas.pagosExtras) {
-    data.cuotas.pagosExtras = CRM_DEFAULT.cuotas.pagosExtras;
-  }
-  if (data.cuotas.convocatoriaAbierta === undefined) {
-    data.cuotas.convocatoriaAbierta = true;
-  }
+  // Migración: asegurar campos nuevos
+  if (data.cuotas.convocatoriaAbierta === undefined) data.cuotas.convocatoriaAbierta = true;
+  if (!data.cuotas.modalidades) data.cuotas.modalidades = JSON.parse(JSON.stringify(CRM_DEFAULT.cuotas.modalidades));
+  if (!data.fondos.presupuestoAnual) data.fondos.presupuestoAnual = JSON.parse(JSON.stringify(CRM_DEFAULT.fondos.presupuestoAnual));
+  // Migrar miembros
+  data.cuotas.miembros.forEach(m => {
+    if (!m.modalidadId) m.modalidadId = 'mensual';
+    if (m.cuotaPersonalizada === undefined) m.cuotaPersonalizada = null;
+  });
   
   return data;
 }
@@ -208,17 +126,13 @@ function initCRM() {
 function getCRM() {
   let data = JSON.parse(localStorage.getItem(CRM_STORAGE_KEY) || 'null') || initCRM();
   
-  // Migración: asegurar nuevos campos
-  if (!data.cuotas.extras) data.cuotas.extras = [];
-  if (!data.cuotas.pagosExtras) data.cuotas.pagosExtras = [];
+  // Migración
   if (data.cuotas.convocatoriaAbierta === undefined) data.cuotas.convocatoriaAbierta = true;
-  if (!data.cuotas.planes) data.cuotas.planes = JSON.parse(JSON.stringify(CRM_DEFAULT.cuotas.planes));
-  if (!data.cuotas.descuentos) data.cuotas.descuentos = JSON.parse(JSON.stringify(CRM_DEFAULT.cuotas.descuentos));
+  if (!data.cuotas.modalidades) data.cuotas.modalidades = JSON.parse(JSON.stringify(CRM_DEFAULT.cuotas.modalidades));
   if (!data.fondos.presupuestoAnual) data.fondos.presupuestoAnual = JSON.parse(JSON.stringify(CRM_DEFAULT.fondos.presupuestoAnual));
-  // Migrar miembros: añadir planId, descuentos si faltan
+  // Migrar miembros
   data.cuotas.miembros.forEach(m => {
-    if (!m.planId) m.planId = 'jugador';
-    if (!m.descuentos) m.descuentos = [];
+    if (!m.modalidadId) m.modalidadId = 'mensual';
     if (m.cuotaPersonalizada === undefined) m.cuotaPersonalizada = null;
   });
   
@@ -419,12 +333,17 @@ function getCuotaMensual(miembro, mes) {
   if (mes === mesAlta || pagosMiembro.length === 0) {
     return data.cuotas.inscripcion;
   }
-  // Si ya pagó inscripción antes, el resto son ordinarias
-  const yaPagoInscripcion = pagosMiembro.some(p => p.importe === data.cuotas.inscripcion && p.pagado);
-  if (!yaPagoInscripcion && pagosMiembro.length === 0) {
-    return data.cuotas.inscripcion;
-  }
-  return data.cuotas.mensualidadOrdinaria;
+  // Resto = mensualidad base * factor de modalidad
+  const modalidad = (data.cuotas.modalidades || []).find(m => m.id === (miembro.modalidadId || 'mensual'));
+  const factor = modalidad ? modalidad.factor : 1.0;
+  return Math.round(data.cuotas.mensualidadOrdinaria * factor * 100) / 100;
+}
+
+function getImporteModalidad(miembro) {
+  const data = getCRM();
+  const modalidad = (data.cuotas.modalidades || []).find(m => m.id === (miembro.modalidadId || 'mensual'));
+  const factor = modalidad ? modalidad.factor : 1.0;
+  return Math.round(data.cuotas.mensualidadOrdinaria * factor * 100) / 100;
 }
 
 function addRevision(accion, detalle) {
@@ -819,111 +738,8 @@ function actualizarCuotas(nuevaInscripcion, nuevaMensualidad) {
 }
 
 // ========================================
-// 13. EXTRAS (GESTOR)
+// 13. (reservado)
 // ========================================
-
-function getExtras() {
-  const data = getCRM();
-  return (data.cuotas.extras || []).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-}
-
-function getPagosExtras() {
-  const data = getCRM();
-  return data.cuotas.pagosExtras || [];
-}
-
-function addExtra(concepto, importe, asignadoA, creadoPor) {
-  const data = getCRM();
-  const nuevoExtra = {
-    id: (data.cuotas.extras || []).length + 1,
-    concepto,
-    importe,
-    fecha: new Date().toISOString().split('T')[0],
-    asignadoA: asignadoA || 'todos',
-    creadoPor
-  };
-  
-  if (!data.cuotas.extras) data.cuotas.extras = [];
-  if (!data.cuotas.pagosExtras) data.cuotas.pagosExtras = [];
-  
-  data.cuotas.extras.push(nuevoExtra);
-  
-  // Si es para todos los miembros activos, crear registros de pago
-  if (asignadoA === 'todos') {
-    const miembros = data.cuotas.miembros.filter(m => m.activo);
-    miembros.forEach(m => {
-      data.cuotas.pagosExtras.push({
-        id: data.cuotas.pagosExtras.length + 1,
-        extraId: nuevoExtra.id,
-        miembroId: m.id,
-        pagado: false,
-        fechaPago: null
-      });
-    });
-  } else if (Array.isArray(asignadoA)) {
-    asignadoA.forEach(miembroId => {
-      data.cuotas.pagosExtras.push({
-        id: data.cuotas.pagosExtras.length + 1,
-        extraId: nuevoExtra.id,
-        miembroId: miembroId,
-        pagado: false,
-        fechaPago: null
-      });
-    });
-  }
-  
-  addRevision('Extra creado', `${concepto} - ${formatEUR(importe)} (${asignadoA === 'todos' ? 'todos los socios' : 'socios seleccionados'})`);
-  saveCRM(data);
-  return { success: true, extra: nuevoExtra };
-}
-
-function pagarExtra(extraId, miembroId) {
-  const data = getCRM();
-  const pagoExtra = (data.cuotas.pagosExtras || []).find(p => p.extraId === extraId && p.miembroId === miembroId);
-  if (!pagoExtra) return { success: false, error: 'Registro de pago no encontrado' };
-  
-  if (pagoExtra.pagado) return { success: false, error: 'Ya está pagado' };
-  
-  pagoExtra.pagado = true;
-  pagoExtra.fechaPago = new Date().toISOString().split('T')[0];
-  
-  const extra = data.cuotas.extras.find(e => e.id === extraId);
-  const miembro = data.cuotas.miembros.find(m => m.id === miembroId);
-  
-  if (extra && miembro) {
-    // Sumar al saldo de fondos
-    data.fondos.saldoActual += extra.importe;
-    
-    // Registrar en historial
-    data.fondos.historial.push({
-      id: data.fondos.historial.length + 1,
-      fecha: new Date().toISOString().split('T')[0],
-      concepto: `Extra: ${extra.concepto} - ${miembro.nombre}`,
-      tipo: 'ingreso',
-      cantidad: extra.importe,
-      categoria: 'cuotas',
-      registradoPor: 'gestor'
-    });
-    
-    addRevision('Extra pagado', `${miembro.nombre} - ${extra.concepto} - ${formatEUR(extra.importe)}`);
-  }
-  
-  saveCRM(data);
-  return { success: true };
-}
-
-function getExtrasPendientesMiembro(miembroId) {
-  const data = getCRM();
-  const extras = data.cuotas.extras || [];
-  const pagosExtras = data.cuotas.pagosExtras || [];
-  
-  return extras.filter(e => {
-    if (e.asignadoA === 'todos') return true;
-    if (Array.isArray(e.asignadoA)) return e.asignadoA.includes(miembroId);
-    return false;
-  }).map(e => {
-    const pago = pagosExtras.find(p => p.extraId === e.id && p.miembroId === miembroId);
-    return {
       ...e,
       pagado: pago ? pago.pagado : false,
       fechaPago: pago ? pago.fechaPago : null
@@ -945,42 +761,26 @@ function getTotalExtrasPendientes() {
 }
 
 // ========================================
-// 14. CÁLCULO AVANZADO DE CUOTAS
+// 14. CÁLCULO DE CUOTAS
 // ========================================
 
-function getPlanInfo(miembro) {
+function getModalidadInfo(miembro) {
   const data = getCRM();
   if (miembro.cuotaPersonalizada !== null && miembro.cuotaPersonalizada !== undefined) {
-    return { nombre: 'Personalizado', precioBase: miembro.cuotaPersonalizada, descripcion: 'Cuota personalizada por el gestor' };
+    return { nombre: 'Personalizado', precioBase: miembro.cuotaPersonalizada, descripcion: 'Cuota personalizada' };
   }
-  const plan = (data.cuotas.planes || []).find(p => p.id === miembro.planId);
-  return plan || { nombre: 'Jugador', precioBase: data.cuotas.mensualidadOrdinaria, descripcion: 'Plan por defecto' };
+  const mod = (data.cuotas.modalidades || []).find(m => m.id === (miembro.modalidadId || 'mensual'));
+  return mod || { nombre: 'Mensual', precioBase: data.cuotas.mensualidadOrdinaria, descripcion: 'Pago mensual', meses: 1, factor: 1.0 };
 }
 
-function calcularCuotaConDescuentos(miembro) {
+function calcularCuota(miembro) {
   const data = getCRM();
-  const planInfo = getPlanInfo(miembro);
-  let precio = planInfo.precioBase;
-  
-  // Aplicar cuota personalizada si existe
   if (miembro.cuotaPersonalizada !== null && miembro.cuotaPersonalizada !== undefined) {
-    precio = miembro.cuotaPersonalizada;
+    return miembro.cuotaPersonalizada;
   }
-  
-  // Aplicar descuentos del miembro
-  if (miembro.descuentos && miembro.descuentos.length > 0) {
-    (data.cuotas.descuentos || []).forEach(d => {
-      if (miembro.descuentos.includes(d.id)) {
-        if (d.tipo === 'porcentaje') {
-          precio -= precio * (d.valor / 100);
-        } else if (d.tipo === 'fijo') {
-          precio -= d.valor;
-        }
-      }
-    });
-  }
-  
-  return Math.max(0, Math.round(precio * 100) / 100);
+  const modalidad = (data.cuotas.modalidades || []).find(m => m.id === (miembro.modalidadId || 'mensual'));
+  const factor = modalidad ? modalidad.factor : 1.0;
+  return Math.round(data.cuotas.mensualidadOrdinaria * factor * 100) / 100;
 }
 
 function getPrecioMesAlta(miembro) {

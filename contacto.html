@@ -23,8 +23,9 @@
   <div class="top-bar">
     <div class="container">
       <div class="top-bar-contact">
+        <span class="top-bar-brand">VOLEY CLUB</span>
         <a href="mailto:voleyclub@laplaceta.org"><i class="fas fa-envelope"></i> voleyclub@laplaceta.org</a>
-        <a href="#"><i class="fas fa-map-marker-alt"></i> Tarragona, España</a>
+        <a href="#"><i class="fas fa-map-marker-alt"></i> Tarragona</a>
       </div>
       <div class="top-bar-social">
         <a href="https://instagram.com/vclaplaceta" target="_blank" aria-label="Instagram @vclaplaceta"><i class="fab fa-instagram"></i></a>
@@ -109,7 +110,7 @@
   <!-- ========================================
        FORMULARIO DE REGISTRO
        ======================================== -->
-  <section class="section-gray">
+  <section class="section-gray" id="inscripcionSection">
     <div class="container">
       <div class="section-header">
         <span class="section-tag">Únete</span>
@@ -120,44 +121,60 @@
       <!-- Estado de convocatoria -->
       <div id="convocatoriaBanner" style="display:none; padding:1rem 1.5rem; border-radius:12px; margin-bottom:1.5rem; font-size:0.9rem; font-weight:600; text-align:center;"></div>
 
-      <div class="form-section">
+      <div class="form-section" id="formSection">
       <form>
-        <!-- Nombre -->
+        <!-- Nombre completo -->
         <div class="form-group">
-          <label for="name">Nombre Completo *</label>
-          <input type="text" id="name" name="name" required placeholder="Tu nombre">
+          <label for="name">Nombre completo *</label>
+          <input type="text" id="name" name="name" required placeholder="Nombre y apellidos">
+        </div>
+
+        <!-- Seudónimo -->
+        <div class="form-group">
+          <label for="seudonimo">Seudónimo</label>
+          <input type="text" id="seudonimo" name="seudonimo" placeholder="Apodo o seudónimo">
+        </div>
+
+        <!-- Fecha de nacimiento + Teléfono -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label for="birthdate">Fecha de nacimiento *</label>
+            <input type="date" id="birthdate" name="birthdate" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Número de teléfono</label>
+            <input type="tel" id="phone" name="phone" placeholder="+34 600 000 000">
+          </div>
         </div>
 
         <!-- Email -->
         <div class="form-group">
-          <label for="email">Email *</label>
+          <label for="email">Correo electrónico *</label>
           <input type="email" id="email" name="email" required placeholder="tu@email.com">
         </div>
 
-        <!-- Teléfono -->
-        <div class="form-group">
-          <label for="phone">Teléfono</label>
-          <input type="tel" id="phone" name="phone" placeholder="+34 600 000 000">
+        <!-- Género + Nivel -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label for="genero">Género</label>
+            <select id="genero" name="genero">
+              <option value="">-- Selecciona --</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+              <option value="otro">Otro</option>
+              <option value="prefiero-no">Prefiero no decirlo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="nivel">Nivel *</label>
+            <select id="nivel" name="nivel" required>
+              <option value="">-- Selecciona tu nivel --</option>
+              <option value="principiante">Principiante</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="avanzado">Avanzado</option>
+            </select>
+          </div>
         </div>
-
-        <!-- Categoría -->
-        <div class="form-group">
-          <label for="category">Categoría de Interés *</label>
-          <select id="category" name="category" required>
-            <option value="">-- Selecciona una categoría --</option>
-            <option value="jugador">Jugador</option>
-            <option value="colaborador">Colaborador/Apoyo</option>
-          </select>
-        </div>
-
-        <!-- Experiencia -->
-        <div class="form-group">
-          <label for="experience">Experiencia en Voleibol</label>
-          <select id="experience" name="experience">
-            <option value="">-- Selecciona tu experiencia --</option>
-            <option value="principiante">Principiante</option>
-            <option value="intermedio">Intermedio</option>
-            <option value="avanzado">Avanzado</option>
             <option value="profesional">Profesional</option>
             <option value="otro">Otro/Colaborador</option>
           </select>
@@ -372,57 +389,58 @@
       
       // Mostrar estado de convocatoria
       const banner = document.getElementById('convocatoriaBanner');
+      const formSection = document.getElementById('formSection');
       try {
         if (typeof isConvocatoriaAbierta === 'function' && !isConvocatoriaAbierta()) {
           banner.style.display = 'block';
           banner.style.background = 'rgba(231,76,60,0.08)';
           banner.style.color = '#c0392b';
           banner.style.border = '1px solid rgba(231,76,60,0.2)';
-          banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Actualmente no hay convocatorias abiertas. La Junta del Grupo de La Placeta ha cerrado el período de inscripciones. Vuelve a intentarlo más tarde.';
-          const formEl = document.querySelector('.form-section form');
-          if (formEl) formEl.querySelectorAll('input, select, textarea, button').forEach(el => el.disabled = true);
+          banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Inscripciones cerradas. La Junta del Grupo de La Placeta ha cerrado el período de inscripciones. Vuelve a intentarlo más tarde.';
+          if (formSection) formSection.style.display = 'none';
         } else if (typeof isConvocatoriaAbierta === 'function') {
           banner.style.display = 'block';
           banner.style.background = 'rgba(46,204,113,0.08)';
           banner.style.color = '#27ae60';
           banner.style.border = '1px solid rgba(46,204,113,0.2)';
           banner.innerHTML = '<i class="fas fa-check-circle"></i> Convocatoria abierta. Estamos aceptando nuevas solicitudes de inscripción.';
+          if (formSection) formSection.style.display = 'block';
         }
       } catch(e) { banner.style.display = 'none'; }
       
       // Reemplazar handler del formulario para incluir CRM
       const form = document.querySelector('.form-section form');
       if (form) {
-        // Clonar para eliminar listeners anteriores
         const newForm = form.cloneNode(true);
         form.parentNode.replaceChild(newForm, form);
         
-        newForm.addEventListener('submit', function(e) {
+        newForm.addEventListener('submit', async function(e) {
           e.preventDefault();
           
           const nombre = document.getElementById('name').value.trim();
           const email = document.getElementById('email').value.trim();
           const telefono = document.getElementById('phone').value.trim();
-          const categoria = document.getElementById('category').value;
+          const seudonimo = document.getElementById('seudonimo')?.value.trim() || '';
+          const birthdate = document.getElementById('birthdate')?.value || '';
+          const genero = document.getElementById('genero')?.value || '';
+          const nivel = document.getElementById('nivel')?.value || '';
           
-          if (!nombre || !email || !categoria) {
+          if (!nombre || !email || !birthdate || !nivel) {
             alert('Por favor, rellena los campos obligatorios.');
             return;
           }
           
-          // Verificar convocatoria abierta
           if (!isConvocatoriaAbierta()) {
-            alert('Actualmente no hay convocatorias abiertas. La Junta del Grupo de La Placeta ha cerrado el período de inscripciones. Vuelve a intentarlo más tarde.');
+            alert('Inscripciones cerradas actualmente.');
             return;
           }
           
           try {
-            // Enviar a API
             try {
-              await API.enviarSolicitud({ nombre, email, telefono, categoria });
+              await API.enviarSolicitud({ nombre, email, telefono, seudonimo, birthdate, genero, nivel });
             } catch(apiErr) { /* fallback */ }
             
-            const resultado = addSolicitudSocio(nombre, email, telefono, categoria);
+            const resultado = addSolicitudSocio(nombre, email, telefono, `Nivel: ${nivel}`);
             if (resultado) {
               newForm.reset();
               showFormSuccess();

@@ -135,69 +135,66 @@
           </form>
         </div>
 
-        <!-- PLANES DE CUOTA -->
+        <!-- MODALIDADES DE PAGO -->
         <div class="card-admin">
           <div class="card-admin-header">
-            <h3><i class="fas fa-layer-group"></i> Planes de Cuota</h3>
+            <h3><i class="fas fa-layer-group"></i> Modalidades de Pago</h3>
             <span style="font-size:0.78rem; color:var(--admin-text-light);">
-              Define precios base por tipo de socio. Los descuentos se aplican después.
+              Define cómo pagan los socios: mensual, trimestral, anual. El factor multiplica la cuota base.
             </span>
           </div>
-          <div id="planesList"></div>
-          <form class="form-admin" id="planForm" style="max-width:500px; margin-top:1rem;" onsubmit="return false;">
-            <div style="display:grid; grid-template-columns:2fr 1fr 2fr; gap:0.8rem;">
+          <div id="modalidadesList"></div>
+          <form class="form-admin" id="modalidadForm" style="max-width:600px; margin-top:1rem;" onsubmit="return false;">
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr 2fr; gap:0.8rem;">
               <div class="form-group-admin" style="margin:0;">
-                <label>Nombre del plan</label>
-                <input type="text" id="planNombre" placeholder="Ej: Veterano">
+                <label>Nombre</label>
+                <input type="text" id="modNombre" placeholder="Ej: Trimestral">
               </div>
               <div class="form-group-admin" style="margin:0;">
-                <label>Precio base (€)</label>
-                <input type="number" id="planPrecio" min="0" step="1" placeholder="10">
+                <label>Meses</label>
+                <input type="number" id="modMeses" min="1" max="12" value="3" placeholder="3">
+              </div>
+              <div class="form-group-admin" style="margin:0;">
+                <label>Factor</label>
+                <input type="number" id="modFactor" min="0.5" max="2" step="0.05" value="0.95" placeholder="0.95">
               </div>
               <div class="form-group-admin" style="margin:0;">
                 <label>Descripción</label>
-                <input type="text" id="planDesc" placeholder="Ej: Jugadores veteranos">
+                <input type="text" id="modDesc" placeholder="Ej: 5% descuento">
               </div>
             </div>
-            <button type="submit" class="btn-admin btn-primary-admin" onclick="crearPlan()">
-              <i class="fas fa-plus"></i> Añadir Plan
+            <button type="submit" class="btn-admin btn-primary-admin" onclick="crearModalidad()">
+              <i class="fas fa-plus"></i> Añadir Modalidad
             </button>
           </form>
         </div>
 
-        <!-- DESCUENTOS -->
+        <!-- ASIGNAR MODALIDAD A SOCIOS + PROGRAMAR PAGOS -->
         <div class="card-admin">
           <div class="card-admin-header">
-            <h3><i class="fas fa-tags"></i> Descuentos</h3>
+            <h3><i class="fas fa-user-cog"></i> Configurar Socio</h3>
           </div>
-          <div id="descuentosList"></div>
-          <form class="form-admin" id="descuentoForm" style="max-width:500px; margin-top:1rem;" onsubmit="return false;">
-            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:0.8rem;">
-              <div class="form-group-admin" style="margin:0;">
-                <label>Nombre</label>
-                <input type="text" id="descNombre" placeholder="Ej: Familia Numerosa">
-              </div>
-              <div class="form-group-admin" style="margin:0;">
-                <label>Tipo</label>
-                <select id="descTipo">
-                  <option value="porcentaje">% Porcentaje</option>
-                  <option value="fijo">€ Fijo</option>
-                </select>
-              </div>
-              <div class="form-group-admin" style="margin:0;">
-                <label>Valor</label>
-                <input type="number" id="descValor" min="0" step="0.5" placeholder="15">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div>
+              <label style="font-size:0.82rem; font-weight:600; display:block; margin-bottom:0.5rem;">Asignar modalidad:</label>
+              <div style="display:flex; gap:0.5rem;">
+                <select id="asignarModMiembro" style="flex:1; padding:0.5rem; border:1px solid var(--admin-border); border-radius:8px; font-family:'Outfit',sans-serif;"></select>
+                <select id="asignarModSelect" style="flex:1; padding:0.5rem; border:1px solid var(--admin-border); border-radius:8px; font-family:'Outfit',sans-serif;"></select>
+                <button class="btn-admin btn-primary-admin btn-admin-sm" onclick="asignarModalidad()">Asignar</button>
               </div>
             </div>
-            <button type="submit" class="btn-admin btn-primary-admin" onclick="crearDescuento()">
-              <i class="fas fa-plus"></i> Añadir Descuento
-            </button>
-          </form>
+            <div>
+              <label style="font-size:0.82rem; font-weight:600; display:block; margin-bottom:0.5rem;">Programar pago mensual:</label>
+              <div style="display:flex; gap:0.5rem;">
+                <select id="progMiembroSelect" style="flex:1; padding:0.5rem; border:1px solid var(--admin-border); border-radius:8px; font-family:'Outfit',sans-serif;"></select>
+                <button class="btn-admin btn-success-admin btn-admin-sm" onclick="programarProximoMes()">
+                  <i class="fas fa-calendar-plus"></i> Prog. mes
+                </button>
+              </div>
+            </div>
+          </div>
+          <div id="miembroInfo" style="margin-top:1rem; padding:1rem; background:var(--admin-bg); border-radius:8px; display:none;"></div>
         </div>
-
-        <!-- ASIGNAR PLAN/DESCUENTO A SOCIOS -->
-        <div class="card-admin">
-          <div class="card-admin-header">
             <h3><i class="fas fa-user-cog"></i> Configurar Socio</h3>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
@@ -221,45 +218,6 @@
           <div id="miembroInfo" style="margin-top:1rem; padding:1rem; background:var(--admin-bg); border-radius:8px; display:none;"></div>
         </div>
 
-        <!-- EXTRAS -->
-        <div class="card-admin">
-          <div class="card-admin-header">
-            <h3><i class="fas fa-plus-circle"></i> Extras (pagos especiales)</h3>
-            <span style="font-size:0.78rem; color:var(--admin-text-light);">
-              <i class="fas fa-info-circle" style="color:var(--admin-accent);"></i> 
-              Crea pagos extraordinarios para justificar gastos importantes o torneos extra
-            </span>
-          </div>
-          <form class="form-admin" id="extraForm" style="max-width:500px;" onsubmit="return false;">
-            <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:1rem;">
-              <div class="form-group-admin" style="margin:0;">
-                <label>Concepto</label>
-                <input type="text" id="extraConcepto" required placeholder="Ej: Torneo extra Costa Dorada">
-              </div>
-              <div class="form-group-admin" style="margin:0;">
-                <label>Importe (€)</label>
-                <input type="number" id="extraImporte" required min="0.01" step="0.01" placeholder="0.00">
-              </div>
-              <div class="form-group-admin" style="margin:0;">
-                <label>Asignar a</label>
-                <select id="extraAsignado">
-                  <option value="todos">Todos los socios</option>
-                  <option value="seleccionar">Seleccionar socios...</option>
-                </select>
-              </div>
-            </div>
-            <div id="extraMiembrosSelect" style="display:none; margin-bottom:1rem;">
-              <p style="font-size:0.78rem; font-weight:600; margin-bottom:0.5rem;">Socios activos:</p>
-              <div id="extraChecklist" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:0.4rem; padding:0.8rem; background:var(--admin-bg); border-radius:8px; max-height:200px; overflow-y:auto;"></div>
-            </div>
-            <button type="submit" class="btn-admin btn-primary-admin" onclick="crearExtra()">
-              <i class="fas fa-plus"></i> Crear Extra
-            </button>
-          </form>
-          <hr style="border-color:var(--admin-border); margin:1.2rem 0;">
-          <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.8rem;">Extras creados</h4>
-          <div id="extrasList"></div>
-        </div>
       </div>
 
       <!-- Solicitudes Pendientes -->
@@ -328,7 +286,7 @@
           <div class="stat-icon bg-orange-light"><i class="fas fa-euro-sign"></i></div>
           <div class="stat-number">${data.cuotas.inscripcion}€ / ${data.cuotas.mensualidadOrdinaria}€</div>
           <div class="stat-label">Inscripción / Mensual</div>
-          <div class="stat-sub">${formatEUR(calcularCuotaConDescuentos(data.cuotas.miembros.filter(m=>m.activo)[0]||{}) * activos)}/mes potencial</div>
+          <div class="stat-sub">${formatEUR(calcularCuota(data.cuotas.miembros.filter(m=>m.activo)[0]||{}) * activos)}/mes potencial</div>
         </div>
         <div class="stat-card-admin">
           <div class="stat-icon bg-red-light"><i class="fas fa-exclamation-circle"></i></div>
@@ -596,32 +554,34 @@
       setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000);
     }
     
-    // ===== PLANES DE CUOTA =====
-    function renderPlanes() {
+    // ===== MODALIDADES DE PAGO =====
+    function renderModalidades() {
       const data = getCRM();
-      const planes = data.cuotas.planes || [];
-      const container = document.getElementById('planesList');
+      const mods = data.cuotas.modalidades || [];
+      const container = document.getElementById('modalidadesList');
       
-      // Rellenar selects de asignación
-      const planSelect = document.getElementById('asignarPlanSelect');
-      planSelect.innerHTML = planes.map(p => `<option value="${p.id}">${p.nombre} (${p.precioBase}€)</option>`).join('');
+      const modSelect = document.getElementById('asignarModSelect');
+      modSelect.innerHTML = mods.map(m => `<option value="${m.id}">${m.nombre} (x${m.factor})</option>`).join('');
       
-      if (planes.length === 0) {
-        container.innerHTML = '<p style="color:var(--admin-text-light);">No hay planes definidos</p>';
+      if (mods.length === 0) {
+        container.innerHTML = '<p style="color:var(--admin-text-light);">No hay modalidades</p>';
         return;
       }
       container.innerHTML = `
         <table class="table-admin">
-          <thead><tr><th>Plan</th><th>Precio Base</th><th>Descripción</th><th>Socios</th><th></th></tr></thead>
+          <thead><tr><th>Modalidad</th><th>Meses</th><th>Factor</th><th>Cuota/mes</th><th>Descripción</th><th>Socios</th><th></th></tr></thead>
           <tbody>
-            ${planes.map(p => {
-              const socios = data.cuotas.miembros.filter(m => m.planId === p.id).length;
+            ${mods.map(m => {
+              const socios = data.cuotas.miembros.filter(x => (x.modalidadId || 'mensual') === m.id).length;
+              const cuota = Math.round(data.cuotas.mensualidadOrdinaria * m.factor * 100) / 100;
               return `<tr>
-                <td style="font-weight:600;">${p.nombre}</td>
-                <td>${formatEUR(p.precioBase)}</td>
-                <td style="font-size:0.82rem;color:var(--admin-text-light);">${p.descripcion || ''}</td>
-                <td>${socios} socios</td>
-                <td><button class="btn-admin btn-danger-admin btn-admin-sm" onclick="eliminarPlan('${p.id}')"><i class="fas fa-trash"></i></button></td>
+                <td style="font-weight:600;">${m.nombre}</td>
+                <td>${m.meses}</td>
+                <td>x${m.factor}</td>
+                <td style="font-weight:700;color:var(--admin-accent);">${formatEUR(cuota)}</td>
+                <td style="font-size:0.82rem;color:var(--admin-text-light);">${m.descripcion || ''}</td>
+                <td>${socios}</td>
+                <td><button class="btn-admin btn-danger-admin btn-admin-sm" onclick="eliminarModalidad('${m.id}')"><i class="fas fa-trash"></i></button></td>
               </tr>`;
             }).join('')}
           </tbody>
@@ -629,111 +589,74 @@
       `;
     }
     
-    function crearPlan() {
-      const nombre = document.getElementById('planNombre').value.trim();
-      const precio = parseFloat(document.getElementById('planPrecio').value);
-      const desc = document.getElementById('planDesc').value.trim();
-      if (!nombre || !precio) { alert('Nombre y precio requeridos'); return; }
+    function crearModalidad() {
+      const nombre = document.getElementById('modNombre').value.trim();
+      const meses = parseInt(document.getElementById('modMeses').value) || 1;
+      const factor = parseFloat(document.getElementById('modFactor').value) || 1;
+      const desc = document.getElementById('modDesc').value.trim();
+      if (!nombre) { alert('Nombre requerido'); return; }
       const data = getCRM();
       const id = nombre.toLowerCase().replace(/[^a-z0-9]/g,'');
-      if (!data.cuotas.planes) data.cuotas.planes = [];
-      data.cuotas.planes.push({ id, nombre, precioBase: precio, descripcion: desc });
+      if (!data.cuotas.modalidades) data.cuotas.modalidades = [];
+      if (data.cuotas.modalidades.find(m => m.id === id)) { alert('Ya existe una modalidad con ese nombre'); return; }
+      data.cuotas.modalidades.push({ id, nombre, meses, factor, descripcion: desc });
       saveCRM(data);
-      document.getElementById('planNombre').value = '';
-      document.getElementById('planPrecio').value = '';
-      document.getElementById('planDesc').value = '';
-      renderPlanes();
+      document.getElementById('modNombre').value = '';
+      document.getElementById('modMeses').value = '3';
+      document.getElementById('modFactor').value = '0.95';
+      document.getElementById('modDesc').value = '';
+      renderModalidades();
       renderCuotas();
-      toastMsg(`Plan "${nombre}" creado`);
+      toastMsg(`Modalidad "${nombre}" creada`);
     }
     
-    function eliminarPlan(id) {
+    function eliminarModalidad(id) {
+      if (id === 'mensual') { alert('No puedes eliminar la modalidad por defecto'); return; }
       const data = getCRM();
-      data.cuotas.planes = (data.cuotas.planes || []).filter(p => p.id !== id);
-      data.cuotas.miembros.forEach(m => { if (m.planId === id) m.planId = 'jugador'; });
+      data.cuotas.modalidades = (data.cuotas.modalidades || []).filter(m => m.id !== id);
+      data.cuotas.miembros.forEach(m => { if (m.modalidadId === id) m.modalidadId = 'mensual'; });
       saveCRM(data);
-      renderPlanes();
+      renderModalidades();
       renderCuotas();
-      toastMsg('Plan eliminado');
+      toastMsg('Modalidad eliminada');
     }
     
-    function asignarPlan() {
-      const miembroId = parseInt(document.getElementById('asignarPlanMiembro').value);
-      const planId = document.getElementById('asignarPlanSelect').value;
+    function asignarModalidad() {
+      const miembroId = parseInt(document.getElementById('asignarModMiembro').value);
+      const modId = document.getElementById('asignarModSelect').value;
       const data = getCRM();
       const m = data.cuotas.miembros.find(m => m.id === miembroId);
-      if (m) { m.planId = planId; saveCRM(data); renderCuotas(); toastMsg('Plan asignado'); }
+      if (m) { m.modalidadId = modId; saveCRM(data); renderCuotas(); toastMsg('Modalidad asignada'); }
     }
     
-    // ===== DESCUENTOS =====
-    function renderDescuentos() {
-      const data = getCRM();
-      const descuentos = data.cuotas.descuentos || [];
-      const container = document.getElementById('descuentosList');
-      const descSelect = document.getElementById('descSelect');
-      descSelect.innerHTML = descuentos.map(d => `<option value="${d.id}">${d.nombre} (${d.tipo === 'porcentaje' ? d.valor+'%' : d.valor+'€'})</option>`).join('');
-      
-      if (descuentos.length === 0) {
-        container.innerHTML = '<p style="color:var(--admin-text-light);">No hay descuentos definidos</p>';
-        return;
-      }
-      container.innerHTML = `
-        <table class="table-admin">
-          <thead><tr><th>Descuento</th><th>Tipo</th><th>Valor</th><th></th></tr></thead>
-          <tbody>
-            ${descuentos.map(d => `<tr>
-              <td style="font-weight:600;">${d.nombre}</td>
-              <td>${d.tipo === 'porcentaje' ? '% Porcentaje' : '€ Fijo'}</td>
-              <td>${d.tipo === 'porcentaje' ? d.valor+'%' : formatEUR(d.valor)}</td>
-              <td><button class="btn-admin btn-danger-admin btn-admin-sm" onclick="eliminarDescuento(${d.id})"><i class="fas fa-trash"></i></button></td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-    
-    function crearDescuento() {
-      const nombre = document.getElementById('descNombre').value.trim();
-      const tipo = document.getElementById('descTipo').value;
-      const valor = parseFloat(document.getElementById('descValor').value);
-      if (!nombre || !valor) { alert('Nombre y valor requeridos'); return; }
-      const data = getCRM();
-      if (!data.cuotas.descuentos) data.cuotas.descuentos = [];
-      const id = (data.cuotas.descuentos.length + 1);
-      data.cuotas.descuentos.push({ id, nombre, tipo, valor, aplicaA: 'todos' });
-      saveCRM(data);
-      document.getElementById('descNombre').value = '';
-      document.getElementById('descValor').value = '';
-      renderDescuentos();
-      toastMsg(`Descuento "${nombre}" creado`);
-    }
-    
-    function eliminarDescuento(id) {
-      const data = getCRM();
-      data.cuotas.descuentos = (data.cuotas.descuentos || []).filter(d => d.id !== id);
-      data.cuotas.miembros.forEach(m => {
-        if (m.descuentos) m.descuentos = m.descuentos.filter(d => d !== id);
-      });
-      saveCRM(data);
-      renderDescuentos();
-      renderCuotas();
-      toastMsg('Descuento eliminado');
-    }
-    
-    function toggleDescuento() {
-      const miembroId = parseInt(document.getElementById('descMiembroSelect').value);
-      const descId = parseInt(document.getElementById('descSelect').value);
+    // ===== PROGRAMAR PAGOS =====
+    function programarProximoMes() {
+      const miembroId = parseInt(document.getElementById('progMiembroSelect').value);
       const data = getCRM();
       const m = data.cuotas.miembros.find(m => m.id === miembroId);
       if (!m) return;
-      if (!m.descuentos) m.descuentos = [];
-      const idx = m.descuentos.indexOf(descId);
-      if (idx === -1) m.descuentos.push(descId);
-      else m.descuentos.splice(idx, 1);
+      
+      const hoy = new Date();
+      const proxMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1);
+      const mesKey = proxMes.toISOString().substring(0, 7);
+      
+      // Verificar si ya existe pago para ese mes
+      const existe = data.cuotas.pagos.find(p => p.miembroId === miembroId && p.mes === mesKey);
+      if (existe) { toastMsg('Ya hay pago programado para ' + getMesNombre(mesKey)); return; }
+      
+      const importe = getCuotaMensual(m, mesKey);
+      data.cuotas.pagos.push({
+        id: data.cuotas.pagos.length + 1,
+        miembroId,
+        mes: mesKey,
+        importe,
+        pagado: false,
+        fechaPago: null,
+        registradoPor: 'gestor'
+      });
       saveCRM(data);
-      actualizarInfoSocio(miembroId);
       renderCuotas();
-      toastMsg('Descuento actualizado');
+      toastMsg(`Pago programado: ${m.nombre} - ${getMesNombre(mesKey)} (${formatEUR(importe)})`);
     }
     
     function actualizarInfoSocio(miembroId) {
@@ -742,18 +665,14 @@
       if (!m) return;
       const info = document.getElementById('miembroInfo');
       info.style.display = 'block';
-      const planInfo = getPlanInfo(m);
-      const cuotaFinal = calcularCuotaConDescuentos(m);
-      const descs = (m.descuentos || []).map(dId => {
-        const d = (data.cuotas.descuentos || []).find(d => d.id === dId);
-        return d ? d.nombre : '';
-      }).filter(Boolean).join(', ') || 'Ninguno';
+      const modInfo = getModalidadInfo(m);
+      const cuotaFinal = calcularCuota(m);
       info.innerHTML = `
         <p style="font-weight:700; margin-bottom:0.5rem;">${m.nombre}</p>
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.8rem; font-size:0.85rem;">
-          <div><strong>Plan:</strong> ${planInfo.nombre} (${formatEUR(planInfo.precioBase)})</div>
-          <div><strong>Descuentos:</strong> ${descs}</div>
-          <div style="font-weight:800; color:var(--admin-accent);"><strong>Cuota final:</strong> ${formatEUR(cuotaFinal)}/mes</div>
+          <div><strong>Modalidad:</strong> ${modInfo.nombre} (x${modInfo.factor || 1})</div>
+          <div><strong>Cuota/mes:</strong> ${formatEUR(cuotaFinal)}</div>
+          <div><strong>Pendiente:</strong> ${getPagosMiembro(m.id).filter(p => !p.pagado).length} meses</div>
         </div>
       `;
     }
@@ -761,23 +680,22 @@
     function rellenarSelectoresSocios() {
       const data = getCRM();
       const miembros = data.cuotas.miembros.filter(m => m.activo);
-      const selects = ['asignarPlanMiembro', 'descMiembroSelect'];
+      const selects = ['asignarModMiembro', 'progMiembroSelect'];
       selects.forEach(id => {
         const sel = document.getElementById(id);
         if (!sel) return;
         sel.innerHTML = miembros.map(m => `<option value="${m.id}">${m.nombre}</option>`).join('');
-        sel.onchange = () => actualizarInfoSocio(parseInt(sel.value));
+        if (id === 'asignarModMiembro') sel.onchange = () => actualizarInfoSocio(parseInt(sel.value));
       });
       if (miembros.length > 0) actualizarInfoSocio(miembros[0].id);
     }
     
-    // Modificar renderCuotas para incluir planes y descuentos
+    // Modificar renderCuotas para incluir modalidades
     const originalRenderCuotas = renderCuotas;
     renderCuotas = function() {
       originalRenderCuotas();
       if (user.role === 'gestor') {
-        renderPlanes();
-        renderDescuentos();
+        renderModalidades();
         rellenarSelectoresSocios();
       }
     };

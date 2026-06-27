@@ -117,6 +117,17 @@ a {
   flex-wrap: wrap;
 }
 
+.top-bar-brand {
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.3rem;
+}
+
 .top-bar-contact a {
   color: rgba(255,255,255,0.85);
   text-decoration: none;
