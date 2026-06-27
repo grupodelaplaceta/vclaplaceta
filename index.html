@@ -248,51 +248,9 @@
   <button class="back-to-top" id="backToTop" aria-label="Volver arriba"><i class="fas fa-chevron-up"></i></button>
 
   <script src="js/data.js"></script>
-  <script src="js/api-client.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Cargar noticias desde API (mutar array existente para que funciones lo vean)
-      try {
-        const noticiasAPI = await API.getNoticias();
-        if (noticiasAPI && noticiasAPI.length > 0) {
-          // Vaciar y rellenar el array news (const, pero mutable)
-          news.length = 0;
-          noticiasAPI.forEach(n => {
-            news.push({
-              id: n.id,
-              date: n.fecha,
-              title: n.titulo,
-              excerpt: n.resumen,
-              content: n.contenido || '',
-              category: n.categoria || 'Noticia',
-              featured: n.destacada || false
-            });
-          });
-        }
-      } catch(e) { /* fallback a data.js */ }
-      
-      try {
-        const partidosAPI = await API.getPartidos();
-        if (partidosAPI && partidosAPI.length > 0) {
-          matches.length = 0;
-          partidosAPI.forEach(p => {
-            matches.push({
-              id: p.id,
-              date: p.fecha,
-              time: p.hora,
-              tournament: p.torneo,
-              homeTeam: p.local,
-              awayTeam: p.visitante,
-              homeScore: p.setsLocal,
-              awayScore: p.setsVisitante,
-              status: 'Finalizado',
-              winner: p.resultado === 'Victoria' ? 'Voley Club La Placeta' : p.visitante
-            });
-          });
-        }
-      } catch(e) { /* fallback */ }
-      
+    document.addEventListener('DOMContentLoaded', () => {
       initHomePage();
       initSponsors();
       initBackToTop();
