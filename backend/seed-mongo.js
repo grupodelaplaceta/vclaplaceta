@@ -6,7 +6,7 @@
 const { MongoClient } = require('mongodb');
 
 // CAMBIA ESTO con tus credenciales reales
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://jjnta_db_user:oX4YWJzxiRegnbvE@clusterwebcrm.eie4kw8.mongodb.net/vcpl_crm?retryWrites=true&w=majority';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://junta_db_user:oX4YWJzxiRegnbvE@clusterwebcrm.eie4kw8.mongodb.net/vcpl_crm?retryWrites=true&w=majority';
 
 async function seed() {
   const c = new MongoClient(MONGO_URI, { serverSelectionTimeoutMS: 10000 });
