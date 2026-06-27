@@ -210,7 +210,7 @@ function createTournamentCard(tournament) {
       <p class="card-subtitle">Temporada ${tournament.season}</p>
       <p class="card-text">${tournament.division || 'Liga'} · ${tournament.level}</p>
       <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 0.8rem; color: var(--text-muted);">${tournament.category}</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">${tournament.division || 'Liga'}</span>
         <span class="tournament-status">${tournament.status}</span>
       </div>
     </div>
@@ -256,14 +256,6 @@ function createNewsItem(newsItem, index = 0) {
 // ========================================
 // 9. RENDERIZADO DE PRÓXIMOS PARTIDOS
 // ========================================
-
-function getUpcomingMatches() {
-  // Retorna el próximo partido
-  if (matches && matches.length > 0) {
-    return [matches[0]]; // El primer partido es el más próximo
-  }
-  return [];
-}
 
 function getLatestNews() {
   // Retorna últimas noticias (hasta 4 para la home)
