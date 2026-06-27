@@ -239,18 +239,70 @@ function createNewsItem(newsItem, index = 0) {
   const item = document.createElement('div');
   item.className = 'news-card stagger-card';
   item.style.transitionDelay = `${index * 0.1}s`;
+  item.style.cursor = 'pointer';
   
-  item.innerHTML = `
-    <span class="news-category">${newsItem.category || 'Noticia'}</span>
-    <p class="news-date">${formatDate(newsItem.date)}</p>
-    <h3 class="news-title">${newsItem.title}</h3>
-    <p class="news-excerpt">${newsItem.excerpt}</p>
-    <div style="margin-top: 1rem;">
-      <span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">Leer más →</span>
+  const imgHtml = newsItem.image
+    ? `<div style="width:100%; height:160px; overflow:hidden; border-radius:8px 8px 0 0;"><img src="${newsItem.image}" alt="${newsItem.title}" style="width:100%; height:100%; object-fit:cover;"></div>`
+    : '';
+  
+  item.innerHTML = imgHtml + `
+    <div style="padding:1.2rem;">
+      <span class="news-category">${newsItem.category || 'Noticia'}</span>
+      <p class="news-date">${formatDate(newsItem.date)}</p>
+      <h3 class="news-title">${newsItem.title}</h3>
+      <p class="news-excerpt">${newsItem.excerpt}</p>
+      <div style="margin-top: 1rem;">
+        <span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">Leer más →</span>
+      </div>
     </div>
   `;
   
+  item.addEventListener('click', () => openNewsModal(newsItem));
+  
   return item;
+}
+
+function openNewsModal(newsItem) {
+  let modal = document.getElementById('newsModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'newsModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;transition:opacity 0.3s;';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <button onclick="closeNewsModal()" style="position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,0.1);border:none;border-radius:50%;width:36px;height:36px;font-size:1.2rem;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;">✕</button>
+        <div id="newsModalContent"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeNewsModal(); });
+  }
+  
+  const content = document.getElementById('newsModalContent');
+  const imgHtml = newsItem.image
+    ? `<img src="${newsItem.image}" alt="${newsItem.title}" style="width:100%;max-height:300px;object-fit:cover;border-radius:16px 16px 0 0;">`
+    : '';
+  
+  content.innerHTML = imgHtml + `
+    <div style="padding:1.5rem 2rem 2rem;">
+      <span style="display:inline-block;background:rgba(255,109,0,0.1);color:#ff6d00;padding:0.2rem 0.8rem;border-radius:50px;font-size:0.75rem;font-weight:700;text-transform:uppercase;margin-bottom:0.5rem;">${newsItem.category || 'Noticia'}</span>
+      <p style="font-size:0.8rem;color:#999;margin-bottom:0.8rem;">${formatDate(newsItem.date)}</p>
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1rem;color:#1a1a2e;">${newsItem.title}</h2>
+      <p style="font-size:0.95rem;color:#5a5a7a;line-height:1.7;">${newsItem.content || newsItem.excerpt}</p>
+    </div>
+  `;
+  
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => modal.style.opacity = '1');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeNewsModal() {
+  const modal = document.getElementById('newsModal');
+  if (modal) {
+    modal.style.opacity = '0';
+    setTimeout(() => { modal.style.display = 'none'; document.body.style.overflow = ''; }, 300);
+  }
 }
 
 // ========================================

@@ -327,53 +327,15 @@ const matches = [
 // 6. NOTICIAS DEL CLUB
 // ========================================
 
-const news = [
-  {
-    id: 1,
-    date: '2026-06-15',
-    title: '¡Victoria en casa! VCPL vence al CV Tarragona',
-    excerpt: 'Nuestro equipo se impuso por 3-0 en un partido intenso ante el CV Tarragona en el pabellón municipal.',
-    content: 'Gran actuación del equipo que dominó de principio a fin ante un rival siempre complicado.',
-    category: 'Partidos',
-    featured: true
-  },
-  {
-    id: 2,
-    date: '2026-06-10',
-    title: 'Abiertas inscripciones para la temporada 2026-2027',
-    excerpt: 'Ya puedes apuntarte para formar parte del Voley Club La Placeta. Buscamos jugadores comprometidos.',
-    content: 'Ampliamos la plantilla para la próxima temporada. Si te gusta el voleibol, este es tu sitio.',
-    category: 'Convocatoria',
-    featured: true
-  },
-  {
-    id: 3,
-    date: '2026-06-05',
-    title: 'Nueva equipación presentada para la temporada',
-    excerpt: 'Estrenamos imagen con la nueva equipación oficial del club para la temporada 2026-2027.',
-    content: 'Diseño renovado manteniendo nuestros colores señas de identidad.',
-    category: 'Club',
-    featured: true
-  },
-  {
-    id: 4,
-    date: '2026-05-28',
-    title: 'Entrenamientos de verano: horarios especiales',
-    excerpt: 'Consulta los horarios especiales de entrenamiento para los meses de julio y agosto.',
-    content: 'Mantenemos la preparación física durante el verano con sesiones adaptadas.',
-    category: 'Entrenamiento',
-    featured: false
-  },
-  {
-    id: 5,
-    date: '2026-05-20',
-    title: 'Torneo amistoso en Tarragona este julio',
-    excerpt: 'Preparamos un torneo amistoso con equipos de la provincia para seguir compitiendo.',
-    content: 'Una oportunidad para seguir sumando minutos de juego y preparar la próxima temporada.',
-    category: 'Eventos',
-    featured: true
-  }
+const NEWS_FALLBACK = [
+  { id: 1, date: '2026-06-15', title: '¡Victoria en casa! VCPL vence al CV Tarragona', excerpt: 'Nuestro equipo se impuso por 3-0 en un partido intenso.', content: 'Gran actuación del equipo que dominó de principio a fin.', category: 'Partidos', featured: true, image: '' },
+  { id: 2, date: '2026-06-10', title: 'Abiertas inscripciones para la temporada', excerpt: 'Ya puedes apuntarte para formar parte del club.', content: 'Ampliamos la plantilla para la próxima temporada.', category: 'Convocatoria', featured: true, image: '' },
+  { id: 3, date: '2026-06-05', title: 'Nueva equipación presentada', excerpt: 'Estrenamos imagen con la nueva equipación oficial.', content: 'Diseño renovado manteniendo nuestros colores.', category: 'Club', featured: true, image: '' },
+  { id: 4, date: '2026-05-28', title: 'Entrenamientos de verano', excerpt: 'Horarios especiales para julio y agosto.', content: 'Mantenemos la preparación física durante el verano.', category: 'Entrenamiento', featured: false, image: '' },
+  { id: 5, date: '2026-05-20', title: 'Torneo amistoso en Tarragona', excerpt: 'Preparamos un torneo con equipos de la provincia.', content: 'Seguimos compitiendo y preparando la próxima temporada.', category: 'Eventos', featured: true, image: '' }
 ];
+
+let news = [...NEWS_FALLBACK];
 
 // ========================================
 // 7. PRÓXIMOS PARTIDOS

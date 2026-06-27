@@ -21,18 +21,21 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Iniciar servidor
-async function start() {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-      console.log(`📡 API disponible en http://localhost:${PORT}/api`);
-    });
-  } catch (err) {
-    console.error('❌ Error al iniciar servidor:', err.message);
-    process.exit(1);
+// Iniciar servidor (local) o exportar para Vercel
+if (!process.env.VERCEL) {
+  async function start() {
+    try {
+      await connectDB();
+      app.listen(PORT, () => {
+        console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+        console.log(`📡 API disponible en http://localhost:${PORT}/api`);
+      });
+    } catch (err) {
+      console.error('❌ Error al iniciar servidor:', err.message);
+      process.exit(1);
+    }
   }
+  start();
 }
 
-start();
+module.exports = app;
