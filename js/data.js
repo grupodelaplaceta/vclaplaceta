@@ -230,97 +230,15 @@ const tournaments = [
 // ========================================
 
 const matches = [
-  {
-    id: 1,
-    date: '2026-05-15',
-    time: '20:30',
-    tournament: 'Superliga Estatal',
-    homeTeam: 'Voley Club La Placeta',
-    awayTeam: 'Voleibol Barcelona',
-    homeScore: 3,
-    awayScore: 1,
-    status: 'Finalizado',
-    winner: 'Voley Club La Placeta',
-    sets: [25, 23, 28, 25]
-  },
-  {
-    id: 2,
-    date: '2026-05-08',
-    time: '19:00',
-    tournament: 'Liga Regional',
-    homeTeam: 'CV Tarragona',
-    awayTeam: 'Voley Club La Placeta',
-    homeScore: 2,
-    awayScore: 3,
-    status: 'Finalizado',
-    winner: 'Voley Club La Placeta',
-    sets: [22, 25, 20, 26, 15]
-  },
-  {
-    id: 3,
-    date: '2026-04-28',
-    time: '18:00',
-    tournament: 'Liga Regional',
-    homeTeam: 'Voley Club La Placeta',
-    awayTeam: 'Reus Voleibol',
-    homeScore: 3,
-    awayScore: 0,
-    status: 'Finalizado',
-    winner: 'Voley Club La Placeta',
-    sets: [25, 24, 26]
-  },
-  {
-    id: 4,
-    date: '2026-04-15',
-    time: '20:30',
-    tournament: 'Superliga Estatal',
-    homeTeam: 'Gigantes del Voleibol',
-    awayTeam: 'Voley Club La Placeta',
-    homeScore: 3,
-    awayScore: 2,
-    status: 'Finalizado',
-    winner: 'Gigantes del Voleibol',
-    sets: [25, 22, 24, 23, 15]
-  },
-  {
-    id: 5,
-    date: '2026-04-05',
-    time: '19:00',
-    tournament: 'Superliga Estatal',
-    homeTeam: 'Voley Club La Placeta',
-    awayTeam: 'Deportivo Terrassa',
-    homeScore: 3,
-    awayScore: 1,
-    status: 'Finalizado',
-    winner: 'Voley Club La Placeta',
-    sets: [25, 27, 23, 25]
-  },
-  {
-    id: 6,
-    date: '2026-03-22',
-    time: '18:00',
-    tournament: 'Liga Regional',
-    homeTeam: 'CV Tarragona',
-    awayTeam: 'Voley Club La Placeta',
-    homeScore: 0,
-    awayScore: 3,
-    status: 'Finalizado',
-    winner: 'Voley Club La Placeta',
-    sets: [20, 25, 22, 26]
-  },
-  {
-    id: 7,
-    date: '2026-03-10',
-    time: '20:30',
-    tournament: 'Superliga Estatal',
-    homeTeam: 'Voley Club La Placeta',
-    awayTeam: 'Potencia Voleibol Valencia',
-    homeScore: 2,
-    awayScore: 3,
-    status: 'Finalizado',
-    winner: 'Potencia Voleibol Valencia',
-    sets: [23, 25, 26, 20, 12]
-  }
+  // Partidos de torneo oficial
+  { id: 1, date: '2026-05-15', time: '20:30', tipo: 'torneo', tournament: 'Superliga Estatal', homeTeam: 'Voley Club La Placeta', awayTeam: 'CV Tarragona', homeScore: 3, awayScore: 1, status: 'Finalizado', winner: 'Voley Club La Placeta', sets: [25, 23, 28, 25] },
+  { id: 2, date: '2026-05-08', time: '19:00', tipo: 'torneo', tournament: 'Liga Regional', homeTeam: 'Reus Voleibol', awayTeam: 'Voley Club La Placeta', homeScore: 2, awayScore: 3, status: 'Finalizado', winner: 'Voley Club La Placeta', sets: [22, 25, 20, 26, 15] },
+  { id: 3, date: '2026-04-28', time: '18:00', tipo: 'torneo', tournament: 'Liga Regional', homeTeam: 'Voley Club La Placeta', awayTeam: 'CV Tarragona', homeScore: 3, awayScore: 0, status: 'Finalizado', winner: 'Voley Club La Placeta', sets: [25, 24, 26] },
+  { id: 4, date: '2026-04-15', time: '20:30', tipo: 'torneo', tournament: 'Superliga Estatal', homeTeam: 'Gigantes Voleibol', awayTeam: 'Voley Club La Placeta', homeScore: 3, awayScore: 2, status: 'Finalizado', winner: 'Gigantes Voleibol', sets: [25, 22, 24, 23, 15] },
+  // Partidos amistosos / casuales
+  { id: 8, date: '2026-06-20', time: '11:00', tipo: 'amistoso', tournament: '', homeTeam: 'Voley Club La Placeta', awayTeam: 'Equipo Universidad Tarragona', homeScore: 2, awayScore: 2, status: 'Finalizado', winner: 'Empate', sets: [25, 22, 23, 25, 0] },
+  { id: 9, date: '2026-06-13', time: '10:30', tipo: 'amistoso', tournament: '', homeTeam: 'Voley Club La Placeta', awayTeam: 'Amigos del Voley Reus', homeScore: 3, awayScore: 1, status: 'Finalizado', winner: 'Voley Club La Placeta', sets: [25, 20, 25, 23] },
+  { id: 10, date: '2026-06-06', time: '17:00', tipo: 'amistoso', tournament: '', homeTeam: 'CE Lleida', awayTeam: 'Voley Club La Placeta', homeScore: 1, awayScore: 3, status: 'Finalizado', winner: 'Voley Club La Placeta', sets: [18, 25, 22, 25] }
 ];
 
 // ========================================
@@ -342,42 +260,12 @@ let news = [...NEWS_FALLBACK];
 // ========================================
 
 const upcomingMatches = [
-  {
-    id: 100,
-    date: '2026-07-10',
-    time: '20:30',
-    tournament: 'Amistoso',
-    homeTeam: 'Voley Club La Placeta',
-    awayTeam: 'CV Tarragona',
-    venue: 'Pabellón Municipal, Tarragona',
-    tickets: 'Disponibles',
-    capacity: 300,
-    ticketPrice: 0
-  },
-  {
-    id: 101,
-    date: '2026-07-18',
-    time: '19:00',
-    tournament: 'Superliga Estatal',
-    homeTeam: 'Voley Club La Placeta',
-    awayTeam: 'Potencia Voleibol Valencia',
-    venue: 'Pabellón Municipal, Tarragona',
-    tickets: 'Disponibles',
-    capacity: 300,
-    ticketPrice: 10
-  },
-  {
-    id: 102,
-    date: '2026-07-25',
-    time: '18:00',
-    tournament: 'Liga Regional',
-    homeTeam: 'Voleibol Reus',
-    awayTeam: 'Voley Club La Placeta',
-    venue: 'Polideportivo Municipal Reus',
-    tickets: 'Por confirmar',
-    capacity: 400,
-    ticketPrice: 5
-  }
+  // Partido de torneo
+  { id: 101, date: '2026-07-18', time: '19:00', tipo: 'torneo', tournament: 'Superliga Estatal', homeTeam: 'Voley Club La Placeta', awayTeam: 'Potencia Voleibol Valencia', venue: 'Pabellón Municipal, Tarragona', tickets: 'Disponibles', capacity: 300, ticketPrice: 10 },
+  { id: 102, date: '2026-07-25', time: '18:00', tipo: 'torneo', tournament: 'Liga Regional', homeTeam: 'Voleibol Reus', awayTeam: 'Voley Club La Placeta', venue: 'Polideportivo Municipal Reus', tickets: 'Por confirmar', capacity: 400, ticketPrice: 5 },
+  // Amistosos / casuales
+  { id: 103, date: '2026-07-10', time: '20:30', tipo: 'amistoso', tournament: '', homeTeam: 'Voley Club La Placeta', awayTeam: 'CV Tarragona', venue: 'Pabellón Municipal, Tarragona', tickets: 'Disponibles', capacity: 300, ticketPrice: 0 },
+  { id: 104, date: '2026-08-02', time: '11:00', tipo: 'amistoso', tournament: '', homeTeam: 'Voley Club La Placeta', awayTeam: 'PICK-UP Amigos del Voley', venue: 'Pista exterior, Tarragona', tickets: 'Libre', capacity: 0, ticketPrice: 0 }
 ];
 
 // ========================================

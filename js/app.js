@@ -151,27 +151,23 @@ function renderMatchesTable(matchesData = matches, containerId = 'matches-contai
     <thead>
       <tr>
         <th>Fecha</th>
-        <th>Equipo Local</th>
+        <th>Tipo</th>
+        <th>Local</th>
         <th>Resultado</th>
-        <th>Equipo Visitante</th>
-        <th>Estado</th>
+        <th>Visitante</th>
       </tr>
     </thead>
     <tbody>
       ${matchesData.map(match => `
         <tr>
-          <td>${formatDate(match.date)}</td>
-          <td>${match.homeTeam}</td>
+          <td style="font-size:0.8rem;">${formatDate(match.date)}</td>
+          <td><span style="font-size:0.65rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:50px;background:${match.tipo === 'amistoso' ? 'rgba(243,156,18,0.15)' : 'rgba(46,204,113,0.15)'};color:${match.tipo === 'amistoso' ? '#c0392b' : '#27ae60'};">${match.tipo === 'amistoso' ? 'Amistoso' : match.tournament}</span></td>
+          <td style="font-weight:600;">${match.homeTeam}</td>
           <td>
             <span class="score-badge">${match.homeScore}</span>
             <span class="score-badge">${match.awayScore}</span>
           </td>
           <td>${match.awayTeam}</td>
-          <td>
-            <span class="status-badge ${match.winner === 'Voley Club La Placeta' ? 'status-victory' : 'status-defeat'}">
-              ${match.winner === 'Voley Club La Placeta' ? '✓ Victoria' : '✕ Derrota'}
-            </span>
-          </td>
         </tr>
       `).join('')}
     </tbody>
@@ -372,14 +368,20 @@ function createMatchCard(match) {
   const isHome = match.homeTeam === 'Voley Club La Placeta';
   const opponent = isHome ? match.awayTeam : match.homeTeam;
   const venue = match.venue || 'Pabellón La Placeta';
+  const tipo = match.tipo || 'torneo';
+  const badgeColor = tipo === 'amistoso' ? '#f39c12' : '#2ecc71';
+  const badgeLabel = tipo === 'amistoso' ? 'Amistoso' : match.tournament || 'Torneo';
   
   const card = document.createElement('div');
   card.className = 'next-match-card';
   
   card.innerHTML = `
     <div class="next-match-header">
-      <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i>
-      ${match.tournament}
+      <span style="display:inline-flex;align-items:center;gap:0.5rem;">
+        <i class="fas fa-${tipo === 'amistoso' ? 'handshake' : 'calendar-alt'}"></i>
+        ${badgeLabel}
+        <span style="font-size:0.6rem;background:${badgeColor};color:#fff;padding:0.1rem 0.5rem;border-radius:50px;font-weight:700;text-transform:uppercase;">${tipo}</span>
+      </span>
     </div>
     <div class="next-match-body">
       <div class="match-teams">
@@ -397,7 +399,7 @@ function createMatchCard(match) {
         <span class="match-detail"><i class="fas fa-calendar"></i> ${formatDate(match.date)}</span>
         <span class="match-detail"><i class="fas fa-clock"></i> ${match.time}</span>
         <span class="match-detail"><i class="fas fa-map-marker-alt"></i> ${venue}</span>
-        <span class="match-detail"><i class="fas fa-ticket-alt"></i> ${match.tickets}</span>
+        <span class="match-detail"><i class="fas fa-ticket-alt"></i> ${match.tickets || 'Entrada libre'}</span>
       </div>
     </div>
   `;

@@ -103,7 +103,7 @@
         </div>
         
         <form class="form-admin" id="partidoForm" style="max-width:100%; margin-bottom:1.5rem; padding:1rem; background:var(--admin-bg); border-radius:8px;">
-          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:0.8rem; margin-bottom:0.8rem;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:0.8rem; margin-bottom:0.8rem;">
             <div class="form-group-admin" style="margin:0;">
               <label>Fecha</label>
               <input type="date" id="partFecha" required>
@@ -113,8 +113,15 @@
               <input type="time" id="partHora" value="20:00">
             </div>
             <div class="form-group-admin" style="margin:0;">
-              <label>Torneo / Liga</label>
-              <input type="text" id="partTorneo" required placeholder="Ej: Superliga Estatal">
+              <label>Tipo</label>
+              <select id="partTipo">
+                <option value="torneo">🏆 Torneo</option>
+                <option value="amistoso">🤝 Amistoso / Casual</option>
+              </select>
+            </div>
+            <div class="form-group-admin" style="margin:0;">
+              <label>Torneo (si aplica)</label>
+              <input type="text" id="partTorneo" placeholder="Ej: Superliga Estatal">
             </div>
           </div>
           <div style="display:grid; grid-template-columns: 1fr 0.5fr 1fr 0.5fr 0.5fr; gap:0.8rem; align-items:end;">
@@ -399,16 +406,16 @@
           ? '<p style="padding:1rem; color:var(--admin-text-light);">No hay partidos registrados.</p>'
           : `<table class="table-admin">
             <thead><tr>
-              <th>Fecha</th><th>Local</th><th>Resultado</th><th>Visitante</th><th>Torneo</th><th>Acción</th>
+              <th>Fecha</th><th>Tipo</th><th>Local</th><th>Resultado</th><th>Visitante</th><th>Acción</th>
             </tr></thead>
             <tbody>
               ${partidos.map(p => `
                 <tr>
-                  <td>${p.fecha}</td>
+                  <td style="font-size:0.82rem;">${p.fecha}</td>
+                  <td><span style="font-size:0.65rem;font-weight:700;padding:0.1rem 0.4rem;border-radius:50px;background:${(p.tipo||'torneo')==='amistoso'?'rgba(243,156,18,0.15)':'rgba(46,204,113,0.15)'};color:${(p.tipo||'torneo')==='amistoso'?'#c0392b':'#27ae60'};">${(p.tipo||'torneo')==='amistoso'?'Amistoso':(p.torneo||'Torneo')}</span></td>
                   <td style="font-weight:600;">${p.local}</td>
                   <td><span class="badge ${p.resultado === 'Victoria' ? 'badge-success' : 'badge-danger'}">${p.setsLocal}-${p.setsVisitante}</span></td>
                   <td>${p.visitante}</td>
-                  <td style="font-size:0.8rem;">${p.torneo || '-'}</td>
                   <td>
                     <button class="btn-admin btn-danger-admin btn-admin-sm" onclick="eliminarPartido(${p.id})" title="Eliminar">
                       <i class="fas fa-trash"></i>
@@ -438,16 +445,18 @@
     
     document.getElementById('partidoForm')?.addEventListener('submit', async function(e) {
       e.preventDefault();
+      const tipo = document.getElementById('partTipo').value;
       const partido = {
         fecha: document.getElementById('partFecha').value,
         hora: document.getElementById('partHora').value,
-        torneo: document.getElementById('partTorneo').value,
+        tipo: tipo,
+        torneo: tipo === 'torneo' ? document.getElementById('partTorneo').value : '',
         local: document.getElementById('partLocal').value,
         visitante: document.getElementById('partVisitante').value,
         setsLocal: parseInt(document.getElementById('partSetsLocal').value) || 0,
         setsVisitante: parseInt(document.getElementById('partSetsVisit').value) || 0,
         resultado: (parseInt(document.getElementById('partSetsLocal').value) || 0) >= 3 ? 'Victoria' : 
-                   (parseInt(document.getElementById('partSetsVisit').value) || 0) >= 3 ? 'Derrota' : 'Pendiente'
+                   (parseInt(document.getElementById('partSetsVisit').value) || 0) >= 3 ? 'Derrota' : 'Empate'
       };
       try {
         await fetch('/api/partidos', {
@@ -458,6 +467,7 @@
         this.reset();
         document.getElementById('partFecha').value = new Date().toISOString().split('T')[0];
         document.getElementById('partLocal').value = 'Voley Club La Placeta';
+        document.getElementById('partTipo').value = 'torneo';
         renderPartidos();
         toastMsg('Partido registrado');
       } catch(e) {
