@@ -88,16 +88,95 @@ router.post('/patrocinios', async (req, res) => { try { const p = await addDoc('
 
 router.get('/dashboard', async (req, res) => {
   try {
-    let f, miembros, torneos, notifs;
+    let f, miembros, torneos, notifs, solicitudes, pagos;
     if (await useMongo()) {
-      f = await coll('fondos').findOne({}) || {}; miembros = await coll('miembros').find({ activo: true }).toArray();
-      torneos = await coll('torneos').find().toArray(); notifs = await coll('notificaciones').find({ leida: false }).toArray();
+      f = await coll('fondos').findOne({}) || {};
+      miembros = await coll('miembros').find().toArray();
+      torneos = await coll('torneos').find().toArray();
+      notifs = await coll('notificaciones').find().toArray();
+      solicitudes = await coll('solicitudes').find({ estado: 'pendiente' }).toArray();
+      pagos = await coll('pagos').find().toArray();
     } else {
-      const d = jd(); f = d.fondos || {}; miembros = (d.miembros || []).filter(m => m.activo !== false);
-      torneos = d.torneos || []; notifs = (d.notificaciones || []).filter(n => !n.leida);
+      const d = jd(); f = d.fondos || {}; miembros = d.miembros || [];
+      torneos = d.torneos || []; notifs = d.notificaciones || [];
+      solicitudes = (d.solicitudes || []).filter(s => s.estado === 'pendiente');
+      pagos = d.pagos || [];
     }
-    const b = (f.proyectosBloqueados || []).filter(p => p.estado === 'bloqueado').reduce((s, p) => s + p.cantidad, 0);
-    res.json({ saldoActual: f.saldoActual || 0, fondosBloqueados: b, fondosDisponibles: (f.saldoActual || 0) - b, miembrosActivos: miembros.length, torneosPendientes: torneos.filter(t => t.estado === 'pendiente').length, notificacionesNoLeidas: notifs.length });
+    const ingresos = (f.historial || []).filter(m => m.tipo === 'ingreso').reduce((s, m) => s + m.cantidad, 0);
+    const gastos = (f.historial || []).filter(m => m.tipo === 'gasto').reduce((s, m) => s + Math.abs(m.cantidad), 0);
+    const bloqueado = (f.proyectosBloqueados || []).filter(p => p.estado === 'bloqueado').reduce((s, p) => s + p.cantidad, 0);
+    const disponible = (f.saldoActual || 0) - bloqueado;
+    const activos = miembros.filter(m => m.activo !== false).length;
+    const morosos = miembros.filter(m => { const mp = pagos.filter(p => p.miembroId === m.id); return mp.length > 0 && !mp[mp.length-1].pagado; }).length;
+    res.json({
+      saldoActual: f.saldoActual || 0, fondosBloqueados: bloqueado, fondosDisponibles: disponible,
+      totalIngresos: ingresos, totalGastos: gastos, miembrosActivos: activos, morosos,
+      torneosPendientes: torneos.filter(t => t.estado === 'pendiente').length,
+      gastoTorneos: torneos.filter(t => t.estado === 'inscrito').reduce((sum, t) => sum + (t.jugadoresAsistentes?.length || 0) * (t.precioPorJugador || 0), 0),
+      solicitudesPendientes: solicitudes.length,
+      notificacionesNoLeidas: notifs.filter(n => !n.leida).length,
+      proyectosActivos: (f.proyectosBloqueados || []).filter(p => p.estado === 'bloqueado').length
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ========================================
+// CRM FULL STATE
+// ========================================
+router.get('/crm-data', async (req, res) => {
+  try {
+    let data = {};
+    if (await useMongo()) {
+      const cols = await coll('config').stats().catch(()=>{}); // check if collection exists
+      const safeFind = async (name) => { try { return await coll(name).find().toArray(); } catch(e) { return []; } };
+      const safeFindOne = async (name) => { try { return await coll(name).findOne({}); } catch(e) { return null; } };
+      data.config = await safeFindOne('config') || {};
+      data.users = await safeFind('users') || [];
+      data.fondos = await safeFindOne('fondos') || { saldoActual: 0, proyectosBloqueados: [], historial: [] };
+      data.miembros = await safeFind('miembros') || [];
+      data.pagos = await safeFind('pagos') || [];
+      data.solicitudes = await safeFind('solicitudes') || [];
+      const torneosArr = await safeFind('torneos') || [];
+      data.torneos = { inscripciones: torneosArr };
+      data.partidos = await safeFind('partidos') || [];
+      data.noticias = await safeFind('noticias') || [];
+      data.notificaciones = await safeFind('notificaciones') || [];
+      data.revisiones = await safeFind('revisiones') || [];
+      data.cuotas = {
+        inscripcion: data.config?.cuotaInscripcion || 35,
+        mensualidadOrdinaria: data.config?.cuotaMensual || 10,
+        convocatoriaAbierta: data.config?.convocatoriaAbierta !== false,
+        modalidades: data.config?.modalidades || [{ id: 'mensual', nombre: 'Mensual', meses: 1, factor: 1.0, descripcion: 'Pago cada mes' }],
+        miembros: data.miembros, pagos: data.pagos,
+        solicitudesPendientes: data.solicitudes.filter(s => s.estado === 'pendiente')
+      };
+    } else {
+      data = jd();
+    }
+    res.json(data);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.post('/crm-data', requireAuth, async (req, res) => {
+  try {
+    const data = req.body;
+    if (await useMongo()) {
+      if (data.fondos) await coll('fondos').replaceOne({}, data.fondos, { upsert: true });
+      if (data.miembros) { await coll('miembros').deleteMany({}); if (data.miembros.length) await coll('miembros').insertMany(data.miembros); }
+      if (data.pagos) { await coll('pagos').deleteMany({}); if (data.pagos.length) await coll('pagos').insertMany(data.pagos); }
+      if (data.solicitudes) { await coll('solicitudes').deleteMany({}); if (data.solicitudes.length) await coll('solicitudes').insertMany(data.solicitudes); }
+      if (data.torneos?.inscripciones) { await coll('torneos').deleteMany({}); if (data.torneos.inscripciones.length) await coll('torneos').insertMany(data.torneos.inscripciones); }
+      if (data.partidos) { await coll('partidos').deleteMany({}); if (data.partidos.length) await coll('partidos').insertMany(data.partidos); }
+      if (data.noticias) { await coll('noticias').deleteMany({}); if (data.noticias.length) await coll('noticias').insertMany(data.noticias); }
+      if (data.notificaciones) { await coll('notificaciones').deleteMany({}); if (data.notificaciones.length) await coll('notificaciones').insertMany(data.notificaciones); }
+      if (data.revisiones) { await coll('revisiones').deleteMany({}); if (data.revisiones.length) await coll('revisiones').insertMany(data.revisiones); }
+      if (data.cuotas) {
+        await coll('config').updateOne({}, { $set: { cuotaInscripcion: data.cuotas.inscripcion, cuotaMensual: data.cuotas.mensualidadOrdinaria, convocatoriaAbierta: data.cuotas.convocatoriaAbierta !== false, modalidades: data.cuotas.modalidades } }, { upsert: true });
+      }
+    } else {
+      Object.assign(jd(), data); saveData();
+    }
+    res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
