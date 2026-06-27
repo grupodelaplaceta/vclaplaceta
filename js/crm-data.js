@@ -89,10 +89,7 @@ const CRM_DEFAULT = {
   // REVISIONES
   revisiones: [],
   // NOTIFICACIONES
-  notificaciones: [],
-    { id: 3, fecha: '2026-05-10', mensaje: 'Nueva solicitud de socio: Lucía Pérez', tipo: 'socio', leida: true, url: 'admin-cuotas.html' },
-    { id: 4, fecha: '2026-05-08', mensaje: 'Presupuesto de temporada al 63% - Revisar gastos', tipo: 'alerta', leida: false, url: 'admin-finanzas.html' }
-  ]
+  notificaciones: []
 };
 
 // ========================================

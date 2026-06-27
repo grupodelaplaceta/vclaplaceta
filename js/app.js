@@ -507,7 +507,7 @@ function initHomePage() {
 
 function initSponsors() {
   const container = document.getElementById('sponsors-container');
-  if (!container || !window.sponsors) return;
+  if (!container || typeof sponsors === 'undefined') return;
   
   container.innerHTML = '';
   
