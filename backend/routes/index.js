@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 const { getDB, saveData } = require('../db');
 
@@ -45,10 +46,15 @@ async function addDoc(c, doc) {
 router.post('/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    let user;
-    if (await useMongo()) user = await coll('users').findOne({ username, password });
-    else user = jd().users.find(u => u.username === username && u.password === password);
-    if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' });
+    let user, valid = false;
+    if (await useMongo()) {
+      user = await coll('users').findOne({ username });
+      if (user) valid = bcrypt.compareSync(password, user.password);
+    } else {
+      user = jd().users.find(u => u.username === username);
+      if (user) valid = user.password === password; // JSON fallback plaintext
+    }
+    if (!user || !valid) return res.status(401).json({ error: 'Credenciales incorrectas' });
     const token = Buffer.from(JSON.stringify({ id: user.id, username: user.username, role: user.role, name: user.name })).toString('base64');
     res.json({ success: true, user: { id: user.id, username: user.username, role: user.role, name: user.name }, token });
   } catch (err) { res.status(500).json({ error: err.message }); }

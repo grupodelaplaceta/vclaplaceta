@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb');
+const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 
@@ -55,7 +56,8 @@ function saveData() { /* MongoDB saves automatically */ }
 async function seedMongo(db) {
   console.log('🌱 Sembrando datos...');
   await db.collection('config').insertOne({ clubName:'Voley Club La Placeta', gestorName:'Junta del Grupo de La Placeta', responsableName:'Responsable del Club' });
-  await db.collection('users').insertMany([{id:1,username:'gestor',password:'gestor2026',role:'gestor',name:'Junta La Placeta'},{id:2,username:'admin',password:'admin2026',role:'responsable',name:'Responsable Club'}]);
+  const salt = bcrypt.genSaltSync(10);
+  await db.collection('users').insertMany([{id:1,username:'gestor',password:bcrypt.hashSync('gestor2026',salt),role:'gestor',name:'Junta La Placeta'},{id:2,username:'admin',password:bcrypt.hashSync('admin2026',salt),role:'responsable',name:'Responsable Club'}]);
   await db.collection('fondos').insertOne({ saldoActual:15000, proyectosBloqueados:[], historial:[{id:1,fecha:'2026-01-15',concepto:'Aportación inicial Junta',tipo:'ingreso',cantidad:15000,categoria:'aportacion',registradoPor:'gestor'}] });
   await db.collection('miembros').insertMany([{id:1,nombre:'David Hernández',posicion:'Líbero',activo:true,fechaAlta:'2026-01-01'},{id:2,nombre:'Javier Robles',posicion:'Colocador',activo:true,fechaAlta:'2026-01-01'},{id:3,nombre:'Miguel Torres',posicion:'Central',activo:true,fechaAlta:'2026-01-15'},{id:4,nombre:'Sofía García',posicion:'Colocadora',activo:true,fechaAlta:'2026-01-01'},{id:5,nombre:'Alejandra López',posicion:'Central',activo:true,fechaAlta:'2026-02-01'},{id:6,nombre:'Raúl Jiménez',posicion:'Receptor',activo:true,fechaAlta:'2026-02-15'}]);
   await db.collection('noticias').insertMany([{id:1,fecha:'2026-06-15',titulo:'¡Victoria en casa!',resumen:'Ganamos 3-0',contenido:'Gran partido',categoria:'Partidos',destacada:true,imagen:''},{id:2,fecha:'2026-06-10',titulo:'Abiertas inscripciones',resumen:'Nueva temporada',contenido:'Apúntate',categoria:'Convocatoria',destacada:true,imagen:''}]);
