@@ -515,11 +515,10 @@ function initSponsors() {
     const card = document.createElement('div');
     card.className = 'sponsor-card';
     card.innerHTML = `
-      <div class="sponsor-logo">${sponsor.logo}</div>
+      <div class="sponsor-logo"><img src="${sponsor.logo}" alt="${sponsor.name}" style="max-width:120px; max-height:80px; object-fit:contain;"></div>
       <div class="sponsor-name">${sponsor.name}</div>
       <div class="sponsor-type">${sponsor.type}</div>
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">${sponsor.description}</p>
-      <a href="https://${sponsor.website}" target="_blank" rel="noopener noreferrer" style="color: var(--accent); font-size: 0.8rem; font-weight: 600;">${sponsor.website} →</a>
     `;
     container.appendChild(card);
   });

@@ -427,7 +427,7 @@ const sponsors = [
     id: 1,
     name: 'Grupo de La Placeta',
     type: 'Oficial',
-    logo: '🏢',
+    logo: 'assets/logogdlp.png',
     website: '',
     description: 'Respaldo institucional del club'
   }
