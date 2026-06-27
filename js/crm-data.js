@@ -735,29 +735,6 @@ function actualizarCuotas(nuevaInscripcion, nuevaMensualidad) {
 }
 
 // ========================================
-// 13. (reservado)
-// ========================================
-      ...e,
-      pagado: pago ? pago.pagado : false,
-      fechaPago: pago ? pago.fechaPago : null
-    };
-  });
-}
-
-function getTotalExtrasPendientes() {
-  const data = getCRM();
-  const pagosExtras = data.cuotas.pagosExtras || [];
-  const extras = data.cuotas.extras || [];
-  
-  return pagosExtras
-    .filter(p => !p.pagado)
-    .reduce((sum, p) => {
-      const extra = extras.find(e => e.id === p.extraId);
-      return sum + (extra ? extra.importe : 0);
-    }, 0);
-}
-
-// ========================================
 // 14. CÁLCULO DE CUOTAS
 // ========================================
 

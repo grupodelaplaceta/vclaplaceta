@@ -35,23 +35,23 @@ async function apiFetch(endpoint, options = {}) {
     headers['x-auth-token'] = token;
   }
   
-  try {
-    const res = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers
-    });
-    
-    const data = await res.json();
-    
-    if (!res.ok) {
-      throw new Error(data.error || 'Error en la petición');
-    }
-    
-    return data;
-  } catch (err) {
-    console.error(`API Error [${endpoint}]:`, err.message);
-    throw err;
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers
+  });
+  
+  // Si el backend no está disponible, lanzar error que se captura en los llamantes
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(text ? `HTTP ${res.status}: ${text.slice(0,80)}` : `HTTP ${res.status}`);
   }
+  
+  const ct = res.headers.get('content-type') || '';
+  if (!ct.includes('application/json')) {
+    throw new Error('Backend no disponible (respuesta no JSON)');
+  }
+  
+  return await res.json();
 }
 
 // ========================================
