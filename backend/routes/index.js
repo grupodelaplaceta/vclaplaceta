@@ -685,8 +685,8 @@ router.post('/torneos-organizados/:id/inscribir', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// POST /api/torneos-organizados/:id/resultado — registrar resultado (CRM)
-router.post('/torneos-organizados/:id/resultado', requireAuth, async (req, res) => {
+// POST /api/torneos-organizados/:id/resultado — registrar resultado (CRM/RSP)
+router.post('/torneos-organizados/:id/resultado', requireVoleyAdmin, async (req, res) => {
   try {
     await ensureTorneosOrganizados();
     const t = (await _torneosOrgArr()).find(x => x.id === Number(req.params.id));
@@ -697,6 +697,97 @@ router.post('/torneos-organizados/:id/resultado', requireAuth, async (req, res) 
     t.resultados.push({ id: t.resultados.length + 1, equipoA, equipoB, setsA: Number(setsA), setsB: Number(setsB) });
     await _saveTorneoOrg(t);
     res.json({ success: true, clasificacion: computeClasificacion(t.equipos, t.resultados) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ========================================
+// ADMIN VÍA RSP (escrituras con clave compartida)
+// ========================================
+
+const VOLEY_ADMIN_KEY = process.env.VOLEY_ADMIN_KEY || 'voley-admin-2026';
+
+function requireVoleyAdmin(req, res, next) {
+  const key = req.headers['x-voley-key'] || req.headers['x-api-key'];
+  if (key && key === VOLEY_ADMIN_KEY) { req.user = { role: 'gestor', name: 'RSP' }; return next(); }
+  return requireAuth(req, res, next);
+}
+
+async function _nextId(arr) {
+  return (arr || []).reduce((m, x) => Math.max(m, Number(x.id) || 0), 0) + 1;
+}
+
+// POST /api/miembros — crear o actualizar jugador desde RSP
+router.post('/miembros', requireVoleyAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    let miembro;
+    if (b.id) {
+      miembro = (await _miembrosArr()).find(m => m.id === Number(b.id));
+      if (!miembro) return res.status(404).json({ error: 'Jugador no encontrado' });
+    } else {
+      miembro = { id: await _nextId(await _miembrosArr()), fechaAlta: new Date().toISOString().split('T')[0], activo: true };
+    }
+    ['nombre', 'dip', 'email', 'telefono', 'posicion', 'planId'].forEach(k => { if (b[k] !== undefined) miembro[k] = b[k]; });
+    if (b.cuotaPersonalizada !== undefined) miembro.cuotaPersonalizada = b.cuotaPersonalizada === '' ? null : Number(b.cuotaPersonalizada);
+    if (b.activo !== undefined) miembro.activo = !!b.activo;
+    if (b.esSuplente !== undefined) miembro.esSuplente = !!b.esSuplente;
+    if (b.cartera && typeof b.cartera.saldo === 'number') { miembro.cartera = miembro.cartera || { saldo: 0, movimientos: [] }; miembro.cartera.saldo = b.cartera.saldo; }
+    if (miembro.dip) miembro.dip = normDip(miembro.dip);
+    if (!miembro.nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
+    await _saveMiembro(miembro);
+    res.json({ success: true, miembro });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/torneos-organizados — crear torneo desde RSP
+router.post('/torneos-organizados', requireVoleyAdmin, async (req, res) => {
+  try {
+    await ensureTorneosOrganizados();
+    const b = req.body || {};
+    if (!b.nombre) return res.status(400).json({ error: 'El nombre del torneo es obligatorio' });
+    const t = {
+      id: await _nextId(await _torneosOrgArr()),
+      nombre: String(b.nombre).trim(),
+      descripcion: String(b.descripcion || ''),
+      organizador: 'Grupo de La Placeta',
+      fecha: String(b.fecha || ''),
+      fechaLimiteInscripcion: String(b.fechaLimiteInscripcion || ''),
+      ubicacion: String(b.ubicacion || ''),
+      modalidad: String(b.modalidad || ''),
+      categoria: String(b.categoria || ''),
+      precioEquipo: Number(b.precioEquipo) || 0,
+      plazas: Number(b.plazas) || 0,
+      premios: String(b.premios || ''),
+      estado: String(b.estado || 'abierto'),
+      equipos: [],
+      resultados: []
+    };
+    await _saveTorneoOrg(t);
+    res.json({ success: true, torneo: torneoOrgPublico(t) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/fondos/movimiento — registrar movimiento de fondos desde RSP
+router.post('/fondos/movimiento', requireVoleyAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const cantidad = Number(b.cantidad) || 0;
+    if (!cantidad) return res.status(400).json({ error: 'Cantidad inválida' });
+    const f = await _fondosDoc();
+    f.historial = f.historial || [];
+    const mov = {
+      id: f.historial.length + 1,
+      fecha: new Date().toISOString().split('T')[0],
+      concepto: String(b.concepto || 'Movimiento'),
+      tipo: cantidad >= 0 ? 'ingreso' : 'gasto',
+      cantidad: Math.abs(cantidad),
+      categoria: String(b.categoria || 'otros'),
+      registradoPor: 'RSP'
+    };
+    f.historial.push(mov);
+    f.saldoActual = Number(f.saldoActual || 0) + cantidad;
+    await _saveFondos(f);
+    res.json({ success: true, movimiento: mov, saldoActual: f.saldoActual });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
