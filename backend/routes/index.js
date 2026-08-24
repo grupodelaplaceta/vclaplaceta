@@ -1,12 +1,13 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
-const { getDB, saveData } = require('../db');
+const { getDB, saveData, connectDB } = require('../db');
 
 let mongoDb = null, jsonFallback = null;
 
 async function useMongo() {
   if (!mongoDb) {
+    await connectDB(); // Conexión perezosa (también en Vercel serverless)
     const r = getDB();
     if (r.isMongo) mongoDb = r.db;
     else jsonFallback = r.json;
