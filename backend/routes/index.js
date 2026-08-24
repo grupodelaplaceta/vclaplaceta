@@ -180,4 +180,322 @@ router.post('/crm-data', requireAuth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ========================================
+// PORTAL DEL JUGADOR (PlacetaID / PLID)
+// ========================================
+
+// Vinculación automática de miembros existentes con su DIP de PlacetaID.
+// En producción el DIP se guarda al dar de alta al jugador en el CRM.
+const DIP_POR_MIEMBRO = {
+  'David Hernández': '11111111D',
+  'Javier Robles': '22222222J',
+  'Miguel Torres': '33333333M',
+  'Sofía García': '44444444S',
+  'Alejandra López': '55555555A',
+  'Raúl Jiménez': '66666666R'
+};
+
+const PROYECTOS_DEFAULT = [
+  { id: 1, nombre: 'Equipación temporada 2027', descripcion: 'Nueva equipación oficial del club.', objetivo: 1500, recaudado: 0, porcentajeGanancia: 10, activo: true },
+  { id: 2, nombre: 'Material de entrenamiento', descripcion: 'Balones, redes y material de gimnasio.', objetivo: 1000, recaudado: 0, porcentajeGanancia: 8, activo: true },
+  { id: 3, nombre: 'Transporte a torneos', descripcion: 'Autobuses y desplazamientos de la temporada.', objetivo: 1200, recaudado: 0, porcentajeGanancia: 5, activo: true }
+];
+
+function normDip(dip) { return String(dip || '').trim().toUpperCase(); }
+function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+
+async function _configDoc() {
+  if (await useMongo()) return (await coll('config').findOne({})) || {};
+  return jd().config || (jd().config = {});
+}
+async function _fondosDoc() {
+  if (await useMongo()) return (await coll('fondos').findOne({})) || {};
+  return jd().fondos || (jd().fondos = {});
+}
+async function _saveFondos(f) {
+  if (await useMongo()) await coll('fondos').replaceOne({}, f, { upsert: true });
+  else { jd().fondos = f; saveData(); }
+}
+async function _miembrosArr() {
+  if (await useMongo()) return await coll('miembros').find().toArray();
+  return jd().miembros || [];
+}
+async function _saveMiembro(m) {
+  if (await useMongo()) await coll('miembros').updateOne({ id: m.id }, { $set: m }, { upsert: true });
+  else {
+    const arr = jd().miembros || (jd().miembros = []);
+    const i = arr.findIndex(x => x.id === m.id);
+    if (i >= 0) arr[i] = m; else arr.push(m);
+    saveData();
+  }
+}
+async function _torneosArr() {
+  if (await useMongo()) return await coll('torneos').find().toArray();
+  return jd().torneos || [];
+}
+async function _saveTorneo(t) {
+  if (await useMongo()) await coll('torneos').updateOne({ id: t.id }, { $set: t }, { upsert: true });
+  else {
+    const arr = jd().torneos || (jd().torneos = []);
+    const i = arr.findIndex(x => x.id === t.id);
+    if (i >= 0) arr[i] = t; else arr.push(t);
+    saveData();
+  }
+}
+async function _partidosArr() {
+  if (await useMongo()) return await coll('partidos').find().toArray();
+  return jd().partidos || [];
+}
+async function _pagosArr() {
+  if (await useMongo()) return await coll('pagos').find().toArray();
+  return jd().pagos || [];
+}
+
+async function ensureMiembroDips() {
+  try {
+    const miembros = await _miembrosArr();
+    for (const m of miembros) {
+      let changed = false;
+      if (!m.dip && DIP_POR_MIEMBRO[m.nombre]) { m.dip = DIP_POR_MIEMBRO[m.nombre]; changed = true; }
+      if (!m.cartera) { m.cartera = { saldo: 0, movimientos: [] }; changed = true; }
+      if (!m.gastos) { m.gastos = []; changed = true; }
+      if (changed) await _saveMiembro(m);
+    }
+  } catch (e) { console.error('ensureMiembroDips:', e.message); }
+}
+
+async function findMiembroByDip(dip) {
+  const nd = normDip(dip);
+  if (!nd) return null;
+  if (await useMongo()) return await coll('miembros').findOne({ dip: nd });
+  return (jd().miembros || []).find(m => normDip(m.dip) === nd) || null;
+}
+
+function estadoPago(mes, pagado) {
+  if (pagado) return { estado: 'pagado', label: 'Pagado' };
+  const hoy = new Date();
+  const [y, m] = mes.split('-').map(Number);
+  const finMargen = new Date(y, m - 1, 14);
+  if (hoy > finMargen) return { estado: 'moroso', label: 'Moroso' };
+  return { estado: 'pendiente', label: 'En plazo' };
+}
+
+async function buildJugadorData(miembro) {
+  const pagos = (await _pagosArr()).filter(p => p.miembroId === miembro.id).sort((a, b) => a.mes.localeCompare(b.mes));
+  const partidos = (await _partidosArr()).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+  const torneos = (await _torneosArr()).filter(t => (t.jugadoresAsistentes || []).includes(miembro.id));
+  const fondos = await _fondosDoc();
+  const proyectos = (fondos.proyectos && fondos.proyectos.length) ? fondos.proyectos : PROYECTOS_DEFAULT;
+  const cartera = miembro.cartera || { saldo: 0, movimientos: [] };
+
+  const cuotas = pagos.map(p => ({ id: p.id, mes: p.mes, importe: p.importe, pagado: p.pagado, fechaPago: p.fechaPago, ...estadoPago(p.mes, p.pagado) }));
+  const totalCuotasPagadas = cuotas.filter(c => c.pagado).reduce((s, c) => s + Number(c.importe || 0), 0);
+  const totalCuotasPendientes = cuotas.filter(c => !c.pagado).reduce((s, c) => s + Number(c.importe || 0), 0);
+
+  const torneosConConfirmacion = torneos.map(t => ({
+    id: t.id,
+    nombre: t.nombre,
+    fecha: t.fecha,
+    precioPorJugador: t.precioPorJugador,
+    estado: t.estado,
+    confirmacion: (t.confirmaciones && t.confirmaciones[miembro.id]) || 'pendiente'
+  }));
+
+  const hoy = new Date().toISOString().split('T')[0];
+  const proximosPartidos = partidos.filter(p => p.fecha >= hoy).reverse();
+  const ultimosPartidos = partidos.filter(p => p.fecha < hoy);
+
+  return {
+    miembro: {
+      id: miembro.id,
+      nombre: miembro.nombre,
+      dip: miembro.dip,
+      posicion: miembro.posicion,
+      email: miembro.email,
+      telefono: miembro.telefono,
+      fechaAlta: miembro.fechaAlta,
+      activo: miembro.activo !== false,
+      cuotaPersonalizada: miembro.cuotaPersonalizada ?? null,
+      planId: miembro.planId
+    },
+    cartera: {
+      saldo: round2(cartera.saldo || 0),
+      movimientos: (cartera.movimientos || []).slice().sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')))
+    },
+    cuotas: {
+      items: cuotas,
+      totalPagadas: round2(totalCuotasPagadas),
+      totalPendientes: round2(totalCuotasPendientes)
+    },
+    gastos: (miembro.gastos || []).slice().sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || ''))),
+    calendario: { proximos: proximosPartidos, ultimos: ultimosPartidos },
+    torneos: torneosConConfirmacion,
+    proyectos: proyectos.filter(p => p.activo !== false),
+    creditoCuotas: round2(miembro.creditoCuotas || 0),
+    aportaciones: miembro.aportaciones || []
+  };
+}
+
+function computeCierre(miembro, año) {
+  const cartera = miembro.cartera || { saldo: 0, movimientos: [] };
+  const sobrante = round2(cartera.saldo || 0);
+  const ingresosAño = (cartera.movimientos || [])
+    .filter(m => m.tipo === 'ingreso' && String(m.fecha || '').startsWith(String(año)))
+    .reduce((s, m) => s + Number(m.cantidad || 0), 0);
+  return {
+    año,
+    sobrante,
+    ingresosAño: round2(ingresosAño),
+    escenarios: {
+      sinRenovar: { comisionPct: 30, comision: round2(sobrante * 0.30), neto: round2(sobrante * 0.70), destinoComision: 'Grupo de La Placeta (gestión)' },
+      renovando: { comisionPct: 20, comision: round2(sobrante * 0.20), neto: round2(sobrante * 0.80), destinoComision: 'Grupo de La Placeta (gestión)' }
+    }
+  };
+}
+
+// GET /api/jugador/:dip — resumen completo del portal del jugador
+router.get('/jugador/:dip', async (req, res) => {
+  try {
+    await ensureMiembroDips();
+    const miembro = await findMiembroByDip(req.params.dip);
+    if (!miembro) return res.status(404).json({ error: 'No se encontró un jugador con ese DIP. Contacta con el club para vincular tu PlacetaID.' });
+    const data = await buildJugadorData(miembro);
+    const config = await _configDoc();
+    data.config = {
+      clubName: config.clubName || 'Voley Club La Placeta',
+      cuotaInscripcion: config.cuotaInscripcion || 35,
+      cuotaMensual: config.cuotaMensual || 10
+    };
+    data.cierre = computeCierre(miembro, new Date().getFullYear());
+    const mensualidad = miembro.cuotaPersonalizada ?? (config.cuotaMensual || 10);
+    data.cierre.cuotasProximoAño = round2(Number(mensualidad) * 12);
+    res.json(data);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/jugador/:dip/cartera — registrar un ingreso en la cartera del jugador
+router.post('/jugador/:dip/cartera', async (req, res) => {
+  try {
+    await ensureMiembroDips();
+    const miembro = await findMiembroByDip(req.params.dip);
+    if (!miembro) return res.status(404).json({ error: 'Jugador no encontrado' });
+    const cantidad = round2(Number(req.body.cantidad || 0));
+    if (cantidad <= 0) return res.status(400).json({ error: 'Cantidad inválida' });
+    const cartera = miembro.cartera || { saldo: 0, movimientos: [] };
+    cartera.movimientos = cartera.movimientos || [];
+    cartera.movimientos.push({
+      id: cartera.movimientos.length + 1,
+      fecha: new Date().toISOString().split('T')[0],
+      concepto: req.body.concepto || 'Ingreso en cartera',
+      tipo: 'ingreso',
+      cantidad
+    });
+    cartera.saldo = round2((cartera.saldo || 0) + cantidad);
+    miembro.cartera = cartera;
+    await _saveMiembro(miembro);
+    res.json({ success: true, cartera });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/jugador/:dip/torneos/:id/confirmar — confirmar asistencia a torneo
+router.post('/jugador/:dip/torneos/:id/confirmar', async (req, res) => {
+  try {
+    await ensureMiembroDips();
+    const miembro = await findMiembroByDip(req.params.dip);
+    if (!miembro) return res.status(404).json({ error: 'Jugador no encontrado' });
+    const torneo = (await _torneosArr()).find(t => t.id === Number(req.params.id));
+    if (!torneo) return res.status(404).json({ error: 'Torneo no encontrado' });
+    const decision = ['confirmado', 'rechazado', 'pendiente'].includes(req.body.confirmacion) ? req.body.confirmacion : 'pendiente';
+    torneo.confirmaciones = torneo.confirmaciones || {};
+    torneo.confirmaciones[miembro.id] = decision;
+    await _saveTorneo(torneo);
+    res.json({ success: true, confirmacion: decision });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/jugador/:dip/cierre — aplicar reparto de cierre de año
+router.post('/jugador/:dip/cierre', async (req, res) => {
+  try {
+    await ensureMiembroDips();
+    const miembro = await findMiembroByDip(req.params.dip);
+    if (!miembro) return res.status(404).json({ error: 'Jugador no encontrado' });
+
+    const año = Number(req.body.año) || new Date().getFullYear();
+    const renueva = !!req.body.renueva;
+    const reparto = Array.isArray(req.body.reparto) ? req.body.reparto : [];
+
+    const cartera = miembro.cartera || { saldo: 0, movimientos: [] };
+    const sobrante = round2(cartera.saldo || 0);
+    const comisionPct = renueva ? 20 : 30;
+    const comision = round2(sobrante * comisionPct / 100);
+    const neto = round2(sobrante - comision);
+    const totalReparto = round2(reparto.reduce((s, r) => s + Number(r.cantidad || 0), 0));
+
+    if (totalReparto > neto + 0.001) {
+      return res.status(400).json({ error: `El reparto (${totalReparto.toFixed(2)}€) supera el neto disponible (${neto.toFixed(2)}€).` });
+    }
+
+    let creditoCuotas = 0;
+    const aportaciones = [];
+    const fondos = await _fondosDoc();
+    const proyectos = (fondos.proyectos && fondos.proyectos.length) ? fondos.proyectos : PROYECTOS_DEFAULT;
+    fondos.proyectos = proyectos;
+
+    for (const r of reparto) {
+      const cantidad = round2(Number(r.cantidad || 0));
+      if (cantidad <= 0) continue;
+      if (r.destino === 'cuotas') {
+        creditoCuotas = round2(creditoCuotas + cantidad);
+      } else if (r.destino === 'proyecto') {
+        const p = proyectos.find(x => x.id === Number(r.proyectoId));
+        if (p) {
+          p.recaudado = round2((p.recaudado || 0) + cantidad);
+          aportaciones.push({
+            proyectoId: p.id,
+            proyecto: p.nombre,
+            cantidad,
+            porcentajeGanancia: p.porcentajeGanancia || 0,
+            fecha: new Date().toISOString().split('T')[0]
+          });
+        }
+      }
+    }
+    await _saveFondos(fondos);
+
+    cartera.movimientos = cartera.movimientos || [];
+    cartera.movimientos.push({
+      id: cartera.movimientos.length + 1,
+      fecha: new Date().toISOString().split('T')[0],
+      concepto: `Cierre de año ${año}`,
+      tipo: 'gasto',
+      cantidad: sobrante
+    });
+    cartera.saldo = 0;
+    miembro.cartera = cartera;
+    miembro.creditoCuotas = round2((miembro.creditoCuotas || 0) + creditoCuotas);
+    miembro.aportaciones = (miembro.aportaciones || []).concat(aportaciones);
+    await _saveMiembro(miembro);
+
+    const cierre = {
+      id: Date.now(),
+      dip: miembro.dip,
+      año,
+      fecha: new Date().toISOString().split('T')[0],
+      renueva,
+      sobrante,
+      comisionPct,
+      comision,
+      destinoComision: 'Grupo de La Placeta (gestión)',
+      neto,
+      reparto,
+      creditoCuotas,
+      aportaciones
+    };
+    if (await useMongo()) await coll('cierres').insertOne(cierre);
+    else { jd().cierres = jd().cierres || []; jd().cierres.push(cierre); saveData(); }
+
+    res.json({ success: true, cierre });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;

@@ -48,7 +48,9 @@ function saveJSON() {
   if (jsonData) fs.writeFileSync(DB_PATH, JSON.stringify(jsonData, null, 2), 'utf8');
 }
 
-function saveData() { /* MongoDB saves automatically */ }
+function saveData() {
+  if (!useMongo) saveJSON();
+}
 
 async function closeDB() {
   if (mongoClient) await mongoClient.close();

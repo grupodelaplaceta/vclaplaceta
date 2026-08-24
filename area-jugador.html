@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Área del Jugador - Voley Club La Placeta">
+  <meta name="theme-color" content="#2a0090">
+  <title>Mi Área | Voley Club La Placeta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    :root { --accent: #ff6d00; --accent2: #2a0090; }
+    .jugador-wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem 5rem; }
+    .jugador-topbar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:2rem; }
+    .jugador-topbar .saludo h1 { font-size:1.5rem; font-weight:900; color:#1a0040; margin:0; }
+    .jugador-topbar .saludo p { margin:.2rem 0 0; color:#666; font-size:.9rem; }
+    .btn-logout { background:#1a0040; color:#fff; border:none; padding:.55rem 1.1rem; border-radius:50px; font-weight:700; font-size:.85rem; cursor:pointer; text-decoration:none; }
+    .dash-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.2rem; }
+    .dash-card { background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(26,0,64,.08); padding:1.3rem; border:1px solid #f0ebfa; }
+    .dash-card h2 { font-size:1rem; font-weight:800; color:#1a0040; margin:0 0 .8rem; display:flex; align-items:center; gap:.5rem; }
+    .dash-card h2 i { color:var(--accent); }
+    .big-number { font-size:2.2rem; font-weight:900; color:#1a0040; line-height:1; }
+    .big-number small { font-size:.9rem; font-weight:600; color:#666; }
+    .saldo-box { background:linear-gradient(135deg,#1a0040,#2a0090); color:#fff; border-radius:16px; padding:1.4rem; }
+    .saldo-box .label { font-size:.8rem; opacity:.8; text-transform:uppercase; letter-spacing:.5px; }
+    .saldo-box .cantidad { font-size:2.6rem; font-weight:900; margin:.3rem 0; }
+    .chip { display:inline-block; padding:.2rem .7rem; border-radius:50px; font-size:.72rem; font-weight:700; }
+    .chip-pagado { background:rgba(46,204,113,.15); color:#1e8449; }
+    .chip-pendiente { background:rgba(243,156,18,.15); color:#b9770e; }
+    .chip-moroso { background:rgba(231,76,60,.15); color:#c0392b; }
+    .chip-confirmado { background:rgba(46,204,113,.15); color:#1e8449; }
+    .chip-rechazado { background:rgba(231,76,60,.15); color:#c0392b; }
+    .chip-info { background:rgba(42,0,144,.1); color:#2a0090; }
+    table.jugador-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    table.jugador-table th { text-align:left; padding:.5rem .4rem; color:#888; font-weight:700; font-size:.72rem; text-transform:uppercase; border-bottom:1px solid #eee; }
+    table.jugador-table td { padding:.55rem .4rem; border-bottom:1px solid #f5f2fb; }
+    .mov-line { display:flex; justify-content:space-between; padding:.45rem 0; border-bottom:1px dashed #eee; font-size:.85rem; }
+    .mov-line .fecha { color:#999; font-size:.75rem; }
+    .ingreso { color:#1e8449; font-weight:700; }
+    .gasto { color:#c0392b; font-weight:700; }
+    .full-row { grid-column:1 / -1; }
+    .torneo-row { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:.7rem 0; border-bottom:1px dashed #eee; flex-wrap:wrap; }
+    .btn-mini { border:none; padding:.35rem .8rem; border-radius:50px; font-weight:700; font-size:.75rem; cursor:pointer; }
+    .btn-confirmar { background:#1e8449; color:#fff; }
+    .btn-rechazar { background:#e74c3c; color:#fff; }
+    .btn-neutral { background:#eee; color:#444; }
+    .cierre-box { background:#fff7f0; border:1px solid #ffe0c2; border-radius:12px; padding:1rem; margin:.6rem 0; }
+    .cierre-box h3 { font-size:.9rem; margin:0 0 .4rem; color:#1a0040; }
+    .form-row { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; margin:.5rem 0; }
+    .form-row input, .form-row select { padding:.45rem .7rem; border:1px solid #ddd; border-radius:8px; font-family:inherit; font-size:.85rem; }
+    .btn-primary-j { background:var(--accent); color:#fff; border:none; padding:.6rem 1.2rem; border-radius:50px; font-weight:800; cursor:pointer; }
+    .error-banner { background:#fdecea; color:#c0392b; border:1px solid #f5c6cb; padding:.8rem 1rem; border-radius:10px; margin-bottom:1rem; display:none; }
+    .login-demo { background:#f4f0ff; border:1px dashed #c9b8f0; border-radius:14px; padding:1rem; margin-top:1rem; text-align:center; }
+    .login-demo select { padding:.45rem .7rem; border-radius:8px; border:1px solid #ddd; font-family:inherit; }
+    .loading-note { text-align:center; color:#888; padding:2rem 0; }
+    @media (max-width:600px){ .big-number{font-size:1.8rem;} }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="container">
+      <div class="top-bar-contact">
+        <span class="top-bar-brand">GRUPO DE LA PLACETA</span>
+        <a href="mailto:voleyclub@laplaceta.org"><i class="fas fa-envelope"></i> voleyclub@laplaceta.org</a>
+        <a href="#"><i class="fas fa-map-marker-alt"></i> Tarragona</a>
+      </div>
+      <div class="top-bar-social">
+        <a href="https://instagram.com/vclaplaceta" target="_blank" aria-label="Instagram @vclaplaceta"><i class="fab fa-instagram"></i></a>
+        <a href="https://youtube.com/@grupodelaplaceta" target="_blank" aria-label="YouTube @grupodelaplaceta"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo-section">
+        <img src="assets/vc.png" alt="Voley Club La Placeta" style="height:45px; width:auto; border-radius:50%;" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';">
+        <span id="logoFallback" class="logo-placeholder">V</span>
+        <span class="club-name">Voley Club <span class="text-accent">La Placeta</span></span>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="jugadores.html">El Club</a></li>
+          <li><a href="torneos.html">Competición</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+          <li><a href="area-jugador.html" class="btn-nav">Mi Área</a></li>
+        </ul>
+      </nav>
+      <div class="hamburger"><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <main class="jugador-wrap">
+
+    <div class="error-banner" id="errorBanner"></div>
+
+    <!-- Estado sin sesión -->
+    <section id="loginSection" style="display:none;">
+      <div class="dash-card" style="max-width:520px; margin:2rem auto; text-align:center;">
+        <h2><i class="fas fa-lock"></i> Acceso de jugadores</h2>
+        <p style="color:#666; font-size:.9rem;">Identifícate con <strong>PlacetaID</strong> para ver tu cartera, cuotas, gastos, calendario y el cierre de año del club.</p>
+        <button class="btn-primary-j" id="btnPlacetaid" style="margin-top:.8rem;">
+          <i class="fas fa-id-card"></i> Entrar con PlacetaID
+        </button>
+
+        <div class="login-demo">
+          <p style="font-size:.8rem; color:#666; margin:0 0 .5rem;"><strong>Acceso demo</strong> (sin PlacetaID, para pruebas locales)</p>
+          <select id="demoDip">
+            <option value="11111111D">David Hernández</option>
+            <option value="22222222J">Javier Robles</option>
+            <option value="33333333M">Miguel Torres</option>
+            <option value="44444444S">Sofía García</option>
+            <option value="55555555A">Alejandra López</option>
+            <option value="66666666R">Raúl Jiménez</option>
+          </select>
+          <button class="btn-mini btn-neutral" id="btnDemoLogin" style="padding:.5rem 1rem;">Entrar demo</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Área de jugador -->
+    <section id="areaSection" style="display:none;">
+      <div class="jugador-topbar">
+        <div class="saludo">
+          <h1><i class="fas fa-id-badge" style="color:var(--accent);"></i> Hola, <span id="jugadorNombre">jugador</span></h1>
+          <p id="jugadorMeta">Posición · DIP</p>
+        </div>
+        <button class="btn-logout" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+      </div>
+
+      <div class="dash-grid">
+        <!-- CARTERA -->
+        <div class="saldo-box">
+          <div class="label"><i class="fas fa-wallet"></i> Mi cartera del club</div>
+          <div class="cantidad" id="carteraSaldo">—</div>
+          <div style="font-size:.8rem; opacity:.85;">Euros ingresados no gastados</div>
+        </div>
+
+        <!-- RESUMEN CUOTAS -->
+        <div class="dash-card">
+          <h2><i class="fas fa-file-invoice"></i> Mis cuotas</h2>
+          <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+            <div><div class="big-number" id="cuotasPagadas">—</div><small>Pagado</small></div>
+            <div><div class="big-number" id="cuotasPendientes">—</div><small>Pendiente</small></div>
+          </div>
+          <div style="margin-top:.8rem; font-size:.8rem; color:#666;">
+            Crédito para el año que viene: <strong id="creditoCuotas">—</strong>
+          </div>
+        </div>
+
+        <!-- MOVIMIENTOS CARTERA -->
+        <div class="dash-card full-row">
+          <h2><i class="fas fa-exchange-alt"></i> Movimientos de mi cartera</h2>
+          <div id="carteraMovimientos"><div class="loading-note">Cargando…</div></div>
+        </div>
+
+        <!-- CUOTAS -->
+        <div class="dash-card full-row">
+          <h2><i class="fas fa-calendar-check"></i> Mis cuotas mensuales personalizadas</h2>
+          <div style="overflow-x:auto;">
+            <table class="jugador-table">
+              <thead><tr><th>Mes</th><th>Importe</th><th>Estado</th><th>Fecha pago</th></tr></thead>
+              <tbody id="cuotasTabla"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- GASTOS -->
+        <div class="dash-card">
+          <h2><i class="fas fa-receipt"></i> Mis gastos con el club</h2>
+          <div id="gastosLista"><div class="loading-note">Cargando…</div></div>
+        </div>
+
+        <!-- APORTACIONES A PROYECTOS -->
+        <div class="dash-card">
+          <h2><i class="fas fa-seedling"></i> Mis proyectos del club</h2>
+          <div id="aportacionesLista"><div class="loading-note">Sin aportaciones todavía.</div></div>
+        </div>
+
+        <!-- CALENDARIO -->
+        <div class="dash-card full-row">
+          <h2><i class="fas fa-calendar-alt"></i> Calendario del club</h2>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1rem;">
+            <div>
+              <h3 style="font-size:.85rem; color:#1a0040; margin:.4rem 0;">Próximos partidos</h3>
+              <div id="proximosPartidos"></div>
+            </div>
+            <div>
+              <h3 style="font-size:.85rem; color:#1a0040; margin:.4rem 0;">Últimos resultados</h3>
+              <div id="ultimosPartidos"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TORNEOS -->
+        <div class="dash-card full-row">
+          <h2><i class="fas fa-trophy"></i> Confirmación de torneos</h2>
+          <div id="torneosLista"></div>
+        </div>
+
+        <!-- CIERRE DE AÑO -->
+        <div class="dash-card full-row">
+          <h2><i class="fas fa-snowflake"></i> Cierre de año <span id="cierreAño"></span></h2>
+          <p style="font-size:.85rem; color:#666; margin-top:0;">
+            Aquí ves el dinero sobrante de tu cartera que no se ha gastado del club. Al cerrar el año,
+            una comisión de gestión se destina al <strong>Grupo de La Placeta</strong> y el resto lo repartes tú.
+          </p>
+          <div id="cierreContenido"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="footer-brand">Voley Club La Placeta</div>
+          <p>Proyecto que impulsa el deporte dando visibilidad a la Asociación Grupo de La Placeta.</p>
+        </div>
+        <div class="footer-section">
+          <h4>El Club</h4>
+          <ul>
+            <li><a href="jugadores.html">Nuestro Equipo</a></li>
+            <li><a href="torneos.html">Competiciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Jugadores</h4>
+          <ul>
+            <li><a href="area-jugador.html">Mi Área</a></li>
+            <li><a href="area-jugador.html">Mi cartera</a></li>
+            <li><a href="area-jugador.html">Cierre de año</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Contacto</h4>
+          <ul>
+            <li><a href="mailto:voleyclub@laplaceta.org"><i class="fas fa-envelope" style="margin-right:0.5rem;"></i>voleyclub@laplaceta.org</a></li>
+            <li><a href="#"><i class="fas fa-map-marker-alt" style="margin-right:0.5rem;"></i>Tarragona, España</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 <span class="accent">Voley Club La Placeta</span>. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/jugador.js"></script>
+</body>
+</html>
