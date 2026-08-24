@@ -732,11 +732,41 @@ router.post('/miembros', requireVoleyAdmin, async (req, res) => {
     if (b.cuotaPersonalizada !== undefined) miembro.cuotaPersonalizada = b.cuotaPersonalizada === '' ? null : Number(b.cuotaPersonalizada);
     if (b.activo !== undefined) miembro.activo = !!b.activo;
     if (b.esSuplente !== undefined) miembro.esSuplente = !!b.esSuplente;
+    if (!miembro.cartera) miembro.cartera = { saldo: 0, movimientos: [] };
     if (b.cartera && typeof b.cartera.saldo === 'number') { miembro.cartera = miembro.cartera || { saldo: 0, movimientos: [] }; miembro.cartera.saldo = b.cartera.saldo; }
     if (miembro.dip) miembro.dip = normDip(miembro.dip);
     if (!miembro.nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
     await _saveMiembro(miembro);
     res.json({ success: true, miembro });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/miembros/:id/cartera — registrar movimiento de cartera desde RSP
+router.post('/miembros/:id/cartera', requireVoleyAdmin, async (req, res) => {
+  try {
+    await ensureMiembroDips();
+    const miembro = (await _miembrosArr()).find(m => m.id === Number(req.params.id));
+    if (!miembro) return res.status(404).json({ error: 'Jugador no encontrado' });
+    const b = req.body || {};
+    const cantidadFirmada = round2(Number(b.cantidad || 0));
+    if (!cantidadFirmada) return res.status(400).json({ error: 'Cantidad inválida' });
+
+    const cartera = miembro.cartera || { saldo: 0, movimientos: [] };
+    cartera.movimientos = cartera.movimientos || [];
+    const mov = {
+      id: cartera.movimientos.length + 1,
+      fecha: new Date().toISOString().split('T')[0],
+      concepto: String(b.concepto || 'Movimiento de cartera'),
+      tipo: cantidadFirmada >= 0 ? 'ingreso' : 'gasto',
+      cantidad: Math.abs(cantidadFirmada),
+      categoria: String(b.categoria || 'otros'),
+      registradoPor: 'RSP'
+    };
+    cartera.movimientos.push(mov);
+    cartera.saldo = round2((cartera.saldo || 0) + cantidadFirmada);
+    miembro.cartera = cartera;
+    await _saveMiembro(miembro);
+    res.json({ success: true, movimiento: mov, cartera });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
