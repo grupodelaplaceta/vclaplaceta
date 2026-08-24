@@ -36,14 +36,6 @@
       }
 
       if (!token || !userStr) {
-        // Permitir modo demo local: ?demo=DIP
-        var demo = params.get('demo');
-        if (demo) {
-          sessionStorage.setItem('vcpl_jugador_dip', demo.trim().toUpperCase());
-          sessionStorage.setItem('vcpl_jugador_nombre', 'Jugador (demo)');
-          window.location.href = '../area-jugador.html';
-          return;
-        }
         fail('No se recibieron datos de autenticación.');
         setTimeout(function(){ window.location.href = '../area-jugador.html'; }, 2500);
         return;

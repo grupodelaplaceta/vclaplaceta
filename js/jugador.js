@@ -10,20 +10,12 @@
 
 // ── CONFIGURACIÓN PLACETAID ──────────────────────────────────────────────────
 const PLACETAID_BASE = 'https://id.laplaceta.org'; // URL de la pasarela PlacetaID
-const PLACETAID_CLIENT_ID = null; // Opcional: apiKey de "Voley Club" registrada en PlacetaID
+const PLACETAID_CLIENT_ID = 'voley-club'; // apiKey de "Voley Club La Placeta" registrada en PlacetaID
 
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:3000/api'
   : '/api';
 
-const DEMO_JUGADORES = {
-  '11111111D': 'David Hernández',
-  '22222222J': 'Javier Robles',
-  '33333333M': 'Miguel Torres',
-  '44444444S': 'Sofía García',
-  '55555555A': 'Alejandra López',
-  '66666666R': 'Raúl Jiménez'
-};
 
 // ── UTILIDADES ───────────────────────────────────────────────────────────────
 function eur(n) {
@@ -60,12 +52,7 @@ function logout() {
 // ── LOGIN PLACETAID ──────────────────────────────────────────────────────────
 function loginWithPlacetaid() {
   const callback = `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}auth/callback.html`;
-  let url;
-  if (PLACETAID_CLIENT_ID) {
-    url = `${PLACETAID_BASE}/?client_id=${encodeURIComponent(PLACETAID_CLIENT_ID)}&redirect_uri=${encodeURIComponent(callback)}&platform=web&state=vcpl-${Date.now()}`;
-  } else {
-    url = `${PLACETAID_BASE}/?from=${encodeURIComponent(callback)}`;
-  }
+  const url = `${PLACETAID_BASE}/?client_id=${encodeURIComponent(PLACETAID_CLIENT_ID)}&redirect_uri=${encodeURIComponent(callback)}&platform=web&state=vcpl-${Date.now()}`;
   window.location.href = url;
 }
 
@@ -330,12 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btnPlacetaid').addEventListener('click', loginWithPlacetaid);
   document.getElementById('btnLogout').addEventListener('click', logout);
-  document.getElementById('btnDemoLogin').addEventListener('click', () => {
-    const dip = document.getElementById('demoDip').value;
-    sessionStorage.setItem('vcpl_jugador_dip', dip);
-    sessionStorage.setItem('vcpl_jugador_nombre', DEMO_JUGADORES[dip] || dip);
-    reloadArea();
-  });
 
   // Si venimos del callback ya hay sesión
   if (!ses) { show(loginSection); hide(areaSection); }

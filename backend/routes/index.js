@@ -498,4 +498,206 @@ router.post('/jugador/:dip/cierre', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ========================================
+// TORNEOS ORGANIZADOS POR GRUPO DE LA PLACETA
+// ========================================
+
+const DEFAULT_TORNEOS_ORGANIZADOS = [
+  {
+    id: 1,
+    nombre: 'Torneo de Verano La Placeta',
+    descripcion: 'Torneo de voleibol 4x4 mixto organizado por el Grupo de La Placeta. Una jornada de competición, música y convivencia. Incluye agua, fruta y avituallamiento para todos los equipos.',
+    organizador: 'Grupo de La Placeta',
+    fecha: '2026-09-12',
+    fechaLimiteInscripcion: '2026-09-05',
+    ubicacion: 'Pabellón Municipal La Placeta · Tarragona',
+    modalidad: '4x4 Mixto',
+    categoria: 'Absoluta',
+    precioEquipo: 40,
+    plazas: 12,
+    premios: '🏆 Trofeo + 150€ campeón · 75€ subcampeón',
+    estado: 'en_curso',
+    equipos: [
+      { id: 1, nombre: 'Placeta Voley', capitan: 'David Hernández', email: 'david@email.com', telefono: '612345678', jugadores: ['David Hernández', 'Sofía García', 'Alejandra López', 'Raúl Jiménez'], pagado: true, fechaInscripcion: '2026-07-20' },
+      { id: 2, nombre: 'Smash Tarraco', capitan: 'Laura Pons', email: 'laura@smash.com', telefono: '600111222', jugadores: ['Laura Pons', 'Marc Vidal', 'Carla Roca', 'Nil Puig'], pagado: true, fechaInscripcion: '2026-07-22' },
+      { id: 3, nombre: 'Costa Daurada VC', capitan: 'Jordi Serra', email: 'jordi@costadaurada.cat', telefono: '600333444', jugadores: ['Jordi Serra', 'Anna Martí', 'Pol Ferrer', 'Maria Roig'], pagado: true, fechaInscripcion: '2026-07-25' },
+      { id: 4, nombre: 'Roca Volei', capitan: 'Eva Llorens', email: 'eva@rocavolei.cat', telefono: '600555666', jugadores: ['Eva Llorens', 'Joan Costa', 'Núria Pi', 'Alex Bosch'], pagado: true, fechaInscripcion: '2026-07-28' },
+      { id: 5, nombre: 'Mediterrani B', capitan: 'Oriol Sabaté', email: 'oriol@mediterrani.cat', telefono: '600777888', jugadores: ['Oriol Sabaté', 'Berta Vidal', 'Sergi Pons', 'Júlia Roca'], pagado: false, fechaInscripcion: '2026-08-02' },
+      { id: 6, nombre: 'Vóley Reus', capitan: 'Marta Solé', email: 'marta@voleyreus.cat', telefono: '600999000', jugadores: ['Marta Solé', 'Iker Font', 'Laia Vidal', 'Marc Serra'], pagado: true, fechaInscripcion: '2026-08-05' }
+    ],
+    resultados: [
+      { id: 1, equipoA: 'Placeta Voley', equipoB: 'Smash Tarraco', setsA: 2, setsB: 0 },
+      { id: 2, equipoA: 'Placeta Voley', equipoB: 'Costa Daurada VC', setsA: 2, setsB: 1 },
+      { id: 3, equipoA: 'Smash Tarraco', equipoB: 'Roca Volei', setsA: 2, setsB: 1 },
+      { id: 4, equipoA: 'Costa Daurada VC', equipoB: 'Mediterrani B', setsA: 2, setsB: 0 },
+      { id: 5, equipoA: 'Roca Volei', equipoB: 'Vóley Reus', setsA: 2, setsB: 0 },
+      { id: 6, equipoA: 'Placeta Voley', equipoB: 'Roca Volei', setsA: 2, setsB: 0 },
+      { id: 7, equipoA: 'Smash Tarraco', equipoB: 'Mediterrani B', setsA: 2, setsB: 0 },
+      { id: 8, equipoA: 'Costa Daurada VC', equipoB: 'Vóley Reus', setsA: 2, setsB: 0 }
+    ]
+  },
+  {
+    id: 2,
+    nombre: 'Copa Primavera GDLP',
+    descripcion: 'Competición de voleibol 6x6 femenino del Grupo de La Placeta. Sistema de liga con fase final y clasificación en directo. Ideal para clubes y equipos federados o amateurs.',
+    organizador: 'Grupo de La Placeta',
+    fecha: '2026-10-03',
+    fechaLimiteInscripcion: '2026-09-26',
+    ubicacion: 'Pabellón Municipal La Placeta · Tarragona',
+    modalidad: '6x6 Femenino',
+    categoria: 'Senior',
+    precioEquipo: 60,
+    plazas: 8,
+    premios: '🏆 Trofeo + 200€ campeón · 100€ subcampeón',
+    estado: 'abierto',
+    equipos: [
+      { id: 1, nombre: 'Placeta Fem', capitan: 'Sofía García', email: 'sofia@email.com', telefono: '645678901', jugadores: ['Sofía García', 'Alejandra López', 'Laia Vidal', 'Anna Martí', 'Júlia Roca', 'Maria Roig'], pagado: true, fechaInscripcion: '2026-08-10' },
+      { id: 2, nombre: 'CV Tarraco', capitan: 'Clara Pons', email: 'clara@cvtarraco.cat', telefono: '601234567', jugadores: ['Clara Pons', 'Marta Solé', 'Berta Vidal', 'Núria Pi', 'Carla Roca', 'Eva Llorens'], pagado: true, fechaInscripcion: '2026-08-12' },
+      { id: 3, nombre: 'Vóley Reus Femení', capitan: 'Aina Ferrer', email: 'aina@voleyreus.cat', telefono: '601987654', jugadores: ['Aina Ferrer', 'Laia Puig', 'Mireia Bosch', 'Paula Serra', 'Jana Roig', 'Clàudia Vidal'], pagado: false, fechaInscripcion: '2026-08-14' },
+      { id: 4, nombre: 'Costa Daurada Fem', capitan: 'Núria Martí', email: 'nuria@costadaurada.cat', telefono: '601555000', jugadores: ['Núria Martí', 'Anna Pons', 'Berta Serra', 'Maria Font', 'Sara Pi', 'Iris Roca'], pagado: true, fechaInscripcion: '2026-08-15' }
+    ],
+    resultados: []
+  }
+];
+
+async function _torneosOrgArr() {
+  if (await useMongo()) return await coll('torneosOrganizados').find().toArray();
+  return jd().torneosOrganizados || [];
+}
+async function _saveTorneoOrg(t) {
+  if (await useMongo()) await coll('torneosOrganizados').updateOne({ id: t.id }, { $set: t }, { upsert: true });
+  else {
+    const arr = jd().torneosOrganizados || (jd().torneosOrganizados = []);
+    const i = arr.findIndex(x => x.id === t.id);
+    if (i >= 0) arr[i] = t; else arr.push(t);
+    saveData();
+  }
+}
+async function ensureTorneosOrganizados() {
+  if (await useMongo()) {
+    try {
+      const cnt = await coll('torneosOrganizados').countDocuments();
+      if (cnt === 0) await coll('torneosOrganizados').insertMany(DEFAULT_TORNEOS_ORGANIZADOS);
+    } catch (e) { console.error('ensureTorneosOrganizados:', e.message); }
+    return;
+  }
+  if (!jd().torneosOrganizados || jd().torneosOrganizados.length === 0) {
+    jd().torneosOrganizados = JSON.parse(JSON.stringify(DEFAULT_TORNEOS_ORGANIZADOS));
+    saveData();
+  }
+}
+
+// Puntos según reglamento de voleibol (sirve para best-of-3 y best-of-5)
+function puntosVoleibol(sw, sl) {
+  const maxSet = Math.max(sw, sl);
+  if (sw > sl) return maxSet === 2 ? (sl === 0 ? 3 : 2) : (sl <= 1 ? 3 : 2);
+  return maxSet === 2 ? (sw === 1 ? 1 : 0) : (sw === 2 ? 1 : 0);
+}
+
+function computeClasificacion(equipos, resultados) {
+  const map = {};
+  (equipos || []).forEach(e => { map[e.nombre] = { equipo: e.nombre, PJ: 0, PG: 0, PP: 0, SF: 0, SC: 0, PTS: 0 }; });
+  (resultados || []).forEach(r => {
+    const a = map[r.equipoA], b = map[r.equipoB];
+    if (!a || !b) return;
+    const sa = Number(r.setsA || 0), sb = Number(r.setsB || 0);
+    a.PJ++; b.PJ++;
+    a.SF += sa; a.SC += sb;
+    b.SF += sb; b.SC += sa;
+    if (sa > sb) { a.PG++; b.PP++; a.PTS += puntosVoleibol(sa, sb); b.PTS += puntosVoleibol(sb, sa); }
+    else { b.PG++; a.PP++; b.PTS += puntosVoleibol(sb, sa); a.PTS += puntosVoleibol(sa, sb); }
+  });
+  return Object.values(map).sort((x, y) => {
+    if (y.PTS !== x.PTS) return y.PTS - x.PTS;
+    const rx = x.SC > 0 ? x.SF / x.SC : x.SF;
+    const ry = y.SC > 0 ? y.SF / y.SC : y.SF;
+    if (ry !== rx) return ry - rx;
+    return y.SF - x.SF;
+  });
+}
+
+function torneoOrgPublico(t) {
+  return {
+    id: t.id,
+    nombre: t.nombre,
+    descripcion: t.descripcion,
+    organizador: t.organizador || 'Grupo de La Placeta',
+    fecha: t.fecha,
+    fechaLimiteInscripcion: t.fechaLimiteInscripcion,
+    ubicacion: t.ubicacion,
+    modalidad: t.modalidad,
+    categoria: t.categoria,
+    precioEquipo: t.precioEquipo,
+    plazas: t.plazas,
+    premios: t.premios,
+    estado: t.estado,
+    equipos: (t.equipos || []).map(e => ({ id: e.id, nombre: e.nombre, capitan: e.capitan, jugadores: e.jugadores, pagado: !!e.pagado, fechaInscripcion: e.fechaInscripcion })),
+    clasificacion: computeClasificacion(t.equipos, t.resultados),
+    plazasLibres: Math.max(0, (t.plazas || 0) - (t.equipos || []).length)
+  };
+}
+
+// GET /api/torneos-organizados — listado de torneos organizados por GDLP
+router.get('/torneos-organizados', async (req, res) => {
+  try {
+    await ensureTorneosOrganizados();
+    const arr = (await _torneosOrgArr()).slice().sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+    res.json(arr.map(torneoOrgPublico));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// GET /api/torneos-organizados/:id — detalle de un torneo
+router.get('/torneos-organizados/:id', async (req, res) => {
+  try {
+    await ensureTorneosOrganizados();
+    const t = (await _torneosOrgArr()).find(x => x.id === Number(req.params.id));
+    if (!t) return res.status(404).json({ error: 'Torneo no encontrado' });
+    res.json(torneoOrgPublico(t));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/torneos-organizados/:id/inscribir — inscripción de un equipo
+router.post('/torneos-organizados/:id/inscribir', async (req, res) => {
+  try {
+    await ensureTorneosOrganizados();
+    const t = (await _torneosOrgArr()).find(x => x.id === Number(req.params.id));
+    if (!t) return res.status(404).json({ error: 'Torneo no encontrado' });
+    if (t.estado === 'finalizado' || t.estado === 'cerrado') return res.status(400).json({ error: 'El periodo de inscripción está cerrado' });
+
+    const { nombre, capitan, email, telefono, jugadores } = req.body;
+    if (!nombre || !capitan) return res.status(400).json({ error: 'El nombre del equipo y el capitán son obligatorios' });
+    if ((t.equipos || []).length >= (t.plazas || 0)) return res.status(400).json({ error: 'No quedan plazas libres en este torneo' });
+
+    const equipo = {
+      id: (t.equipos || []).length + 1,
+      nombre: String(nombre).trim(),
+      capitan: String(capitan).trim(),
+      email: String(email || '').trim(),
+      telefono: String(telefono || '').trim(),
+      jugadores: Array.isArray(jugadores) ? jugadores.map(j => String(j).trim()).filter(Boolean) : [],
+      pagado: false,
+      fechaInscripcion: new Date().toISOString().split('T')[0]
+    };
+    t.equipos = t.equipos || [];
+    t.equipos.push(equipo);
+    await _saveTorneoOrg(t);
+    res.json({ success: true, equipo });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/torneos-organizados/:id/resultado — registrar resultado (CRM)
+router.post('/torneos-organizados/:id/resultado', requireAuth, async (req, res) => {
+  try {
+    await ensureTorneosOrganizados();
+    const t = (await _torneosOrgArr()).find(x => x.id === Number(req.params.id));
+    if (!t) return res.status(404).json({ error: 'Torneo no encontrado' });
+    const { equipoA, equipoB, setsA, setsB } = req.body;
+    if (!equipoA || !equipoB || setsA == null || setsB == null) return res.status(400).json({ error: 'Datos de resultado incompletos' });
+    t.resultados = t.resultados || [];
+    t.resultados.push({ id: t.resultados.length + 1, equipoA, equipoB, setsA: Number(setsA), setsB: Number(setsB) });
+    await _saveTorneoOrg(t);
+    res.json({ success: true, clasificacion: computeClasificacion(t.equipos, t.resultados) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;
