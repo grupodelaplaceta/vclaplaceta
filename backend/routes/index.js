@@ -74,7 +74,30 @@ router.get('/fondos', async (req, res) => {
 router.get('/miembros', async (req, res) => { try { res.json(await getDoc('miembros', { id: 1 })); } catch (err) { res.status(500).json({ error: err.message }); } });
 router.get('/solicitudes', async (req, res) => { try { res.json(await getDoc('solicitudes', { id: -1 })); } catch (err) { res.status(500).json({ error: err.message }); } });
 router.post('/solicitudes', async (req, res) => { try { const s = await addDoc('solicitudes', { ...req.body, fechaSolicitud: new Date().toISOString().split('T')[0], estado: 'pendiente' }); res.json({ success: true, solicitud: s }); } catch (err) { res.status(500).json({ error: err.message }); } });
-router.get('/torneos', async (req, res) => { try { res.json(await getDoc('torneos', { id: -1 })); } catch (err) { res.status(500).json({ error: err.message }); } });
+function torneoInternoView(t) {
+  const asistentes = t.jugadoresAsistentes || [];
+  const conf = t.confirmaciones || {};
+  const confirmados = asistentes.filter((id) => conf[id] === 'confirmado').length;
+  const rechazados = asistentes.filter((id) => conf[id] === 'rechazado').length;
+  const pendientes = asistentes.length - confirmados - rechazados;
+  const precio = Number(t.precioPorJugador || 0);
+  return {
+    ...t,
+    costeTotal: round2(asistentes.length * precio),
+    costeConfirmado: round2(confirmados * precio),
+    confirmados,
+    rechazados,
+    pendientes
+  };
+}
+
+// GET /api/torneos — torneos internos (el propio equipo participa)
+router.get('/torneos', async (req, res) => {
+  try {
+    const arr = await _torneosArr();
+    res.json(arr.slice().sort((a, b) => Number(b.id) - Number(a.id)).map(torneoInternoView));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 router.get('/partidos', async (req, res) => { try { res.json(await getDoc('partidos', { fecha: -1 })); } catch (err) { res.status(500).json({ error: err.message }); } });
 router.post('/partidos', requireAuth, async (req, res) => { try { const p = await addDoc('partidos', { ...req.body, creadoPor: req.user.name }); res.json({ success: true, partido: p }); } catch (err) { res.status(500).json({ error: err.message }); } });
 router.get('/noticias', async (req, res) => { try { res.json(await getDoc('noticias', { fecha: -1 })); } catch (err) { res.status(500).json({ error: err.message }); } });
@@ -347,6 +370,14 @@ function computeCierre(miembro, año) {
     año,
     sobrante,
     ingresosAño: round2(ingresosAño),
+    prevision: {
+      sobrante,
+      comisionPctRenovando: 20,
+      importeFinalRenovando: round2(sobrante * 0.80),
+      comisionPctSinRenovar: 30,
+      importeFinalSinRenovar: round2(sobrante * 0.70),
+      destinoComision: 'Grupo de La Placeta (gestión)'
+    },
     escenarios: {
       sinRenovar: { comisionPct: 30, comision: round2(sobrante * 0.30), neto: round2(sobrante * 0.70), destinoComision: 'Grupo de La Placeta (gestión)' },
       renovando: { comisionPct: 20, comision: round2(sobrante * 0.20), neto: round2(sobrante * 0.80), destinoComision: 'Grupo de La Placeta (gestión)' }
@@ -420,6 +451,13 @@ router.post('/jugador/:dip/cierre', async (req, res) => {
     await ensureMiembroDips();
     const miembro = await findMiembroByDip(req.params.dip);
     if (!miembro) return res.status(404).json({ error: 'Jugador no encontrado' });
+
+    // El reparto definitivo no se ejecuta hasta diciembre (salvo administración vía x-voley-key).
+    const esDiciembre = new Date().getMonth() === 11;
+    const adminKey = req.headers['x-voley-key'] || req.headers['x-api-key'];
+    if (!esDiciembre && adminKey !== VOLEY_ADMIN_KEY) {
+      return res.status(400).json({ error: 'El reparto definitivo se ejecuta en diciembre. Consulta la previsión disponible en tu panel.' });
+    }
 
     const año = Number(req.body.año) || new Date().getFullYear();
     const renueva = !!req.body.renueva;
@@ -518,6 +556,7 @@ const DEFAULT_TORNEOS_ORGANIZADOS = [
     plazas: 12,
     premios: '🏆 Trofeo + 150€ campeón · 75€ subcampeón',
     estado: 'en_curso',
+    visiblePublico: false,
     equipos: [
       { id: 1, nombre: 'Placeta Voley', capitan: 'David Hernández', email: 'david@email.com', telefono: '612345678', jugadores: ['David Hernández', 'Sofía García', 'Alejandra López', 'Raúl Jiménez'], pagado: true, fechaInscripcion: '2026-07-20' },
       { id: 2, nombre: 'Smash Tarraco', capitan: 'Laura Pons', email: 'laura@smash.com', telefono: '600111222', jugadores: ['Laura Pons', 'Marc Vidal', 'Carla Roca', 'Nil Puig'], pagado: true, fechaInscripcion: '2026-07-22' },
@@ -551,6 +590,7 @@ const DEFAULT_TORNEOS_ORGANIZADOS = [
     plazas: 8,
     premios: '🏆 Trofeo + 200€ campeón · 100€ subcampeón',
     estado: 'abierto',
+    visiblePublico: false,
     equipos: [
       { id: 1, nombre: 'Placeta Fem', capitan: 'Sofía García', email: 'sofia@email.com', telefono: '645678901', jugadores: ['Sofía García', 'Alejandra López', 'Laia Vidal', 'Anna Martí', 'Júlia Roca', 'Maria Roig'], pagado: true, fechaInscripcion: '2026-08-10' },
       { id: 2, nombre: 'CV Tarraco', capitan: 'Clara Pons', email: 'clara@cvtarraco.cat', telefono: '601234567', jugadores: ['Clara Pons', 'Marta Solé', 'Berta Vidal', 'Núria Pi', 'Carla Roca', 'Eva Llorens'], pagado: true, fechaInscripcion: '2026-08-12' },
@@ -632,6 +672,7 @@ function torneoOrgPublico(t) {
     plazas: t.plazas,
     premios: t.premios,
     estado: t.estado,
+    visiblePublico: t.visiblePublico === true,
     equipos: (t.equipos || []).map(e => ({ id: e.id, nombre: e.nombre, capitan: e.capitan, jugadores: e.jugadores, pagado: !!e.pagado, fechaInscripcion: e.fechaInscripcion })),
     clasificacion: computeClasificacion(t.equipos, t.resultados),
     plazasLibres: Math.max(0, (t.plazas || 0) - (t.equipos || []).length)
@@ -642,7 +683,7 @@ function torneoOrgPublico(t) {
 router.get('/torneos-organizados', async (req, res) => {
   try {
     await ensureTorneosOrganizados();
-    const arr = (await _torneosOrgArr()).slice().sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+    const arr = (await _torneosOrgArr()).filter(t => t.visiblePublico === true).sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
     res.json(arr.map(torneoOrgPublico));
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -653,6 +694,7 @@ router.get('/torneos-organizados/:id', async (req, res) => {
     await ensureTorneosOrganizados();
     const t = (await _torneosOrgArr()).find(x => x.id === Number(req.params.id));
     if (!t) return res.status(404).json({ error: 'Torneo no encontrado' });
+    if (t.visiblePublico !== true) return res.status(404).json({ error: 'Torneo no disponible públicamente' });
     res.json(torneoOrgPublico(t));
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -716,6 +758,61 @@ function requireVoleyAdmin(req, res, next) {
 async function _nextId(arr) {
   return (arr || []).reduce((m, x) => Math.max(m, Number(x.id) || 0), 0) + 1;
 }
+
+function torneoOrgAdmin(t) {
+  return {
+    ...t,
+    visiblePublico: t.visiblePublico === true,
+    clasificacion: computeClasificacion(t.equipos, t.resultados),
+    plazasLibres: Math.max(0, (t.plazas || 0) - (t.equipos || []).length),
+    ingresosPrevistos: round2((t.equipos || []).length * Number(t.precioEquipo || 0)),
+    ingresosCobrados: round2((t.equipos || []).filter(e => e.pagado).length * Number(t.precioEquipo || 0))
+  };
+}
+
+// GET /api/torneos-organizados/admin — listado completo (incluye ocultos) para RSP
+router.get('/torneos-organizados/admin', requireVoleyAdmin, async (req, res) => {
+  try {
+    await ensureTorneosOrganizados();
+    const arr = (await _torneosOrgArr()).slice().sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+    res.json(arr.map(torneoOrgAdmin));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/torneos-organizados/:id/visibilidad — publicar/ocultar un torneo de La Placeta
+router.post('/torneos-organizados/:id/visibilidad', requireVoleyAdmin, async (req, res) => {
+  try {
+    await ensureTorneosOrganizados();
+    const t = (await _torneosOrgArr()).find(x => x.id === Number(req.params.id));
+    if (!t) return res.status(404).json({ error: 'Torneo no encontrado' });
+    t.visiblePublico = req.body.visiblePublico === true;
+    await _saveTorneoOrg(t);
+    res.json({ success: true, torneo: torneoOrgAdmin(t) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/torneos — crear torneo interno (jugado por los propios jugadores) desde RSP
+router.post('/torneos', requireVoleyAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    if (!b.nombre) return res.status(400).json({ error: 'El nombre del torneo es obligatorio' });
+    const t = {
+      id: await _nextId(await _torneosArr()),
+      nombre: String(b.nombre).trim(),
+      descripcion: String(b.descripcion || ''),
+      fecha: String(b.fecha || ''),
+      ubicacion: String(b.ubicacion || ''),
+      precioPorJugador: Number(b.precioPorJugador) || 0,
+      jugadoresAsistentes: Array.isArray(b.jugadoresAsistentes) ? b.jugadoresAsistentes.map(Number) : [],
+      estado: String(b.estado || 'pendiente'),
+      solicitadoPor: 'RSP',
+      aprobadoPor: 'RSP',
+      confirmaciones: {}
+    };
+    await _saveTorneo(t);
+    res.json({ success: true, torneo: torneoInternoView(t) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
 // POST /api/miembros — crear o actualizar jugador desde RSP
 router.post('/miembros', requireVoleyAdmin, async (req, res) => {
@@ -790,6 +887,7 @@ router.post('/torneos-organizados', requireVoleyAdmin, async (req, res) => {
       plazas: Number(b.plazas) || 0,
       premios: String(b.premios || ''),
       estado: String(b.estado || 'abierto'),
+      visiblePublico: b.visiblePublico === true,
       equipos: [],
       resultados: []
     };
