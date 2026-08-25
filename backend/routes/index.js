@@ -688,6 +688,15 @@ router.get('/torneos-organizados', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// GET /api/torneos-organizados/admin — listado completo (incluye ocultos) para RSP
+router.get('/torneos-organizados/admin', requireVoleyAdmin, async (req, res) => {
+  try {
+    await ensureTorneosOrganizados();
+    const arr = (await _torneosOrgArr()).slice().sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+    res.json(arr.map(torneoOrgAdmin));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // GET /api/torneos-organizados/:id — detalle de un torneo
 router.get('/torneos-organizados/:id', async (req, res) => {
   try {
@@ -769,15 +778,6 @@ function torneoOrgAdmin(t) {
     ingresosCobrados: round2((t.equipos || []).filter(e => e.pagado).length * Number(t.precioEquipo || 0))
   };
 }
-
-// GET /api/torneos-organizados/admin — listado completo (incluye ocultos) para RSP
-router.get('/torneos-organizados/admin', requireVoleyAdmin, async (req, res) => {
-  try {
-    await ensureTorneosOrganizados();
-    const arr = (await _torneosOrgArr()).slice().sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
-    res.json(arr.map(torneoOrgAdmin));
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
 
 // POST /api/torneos-organizados/:id/visibilidad — publicar/ocultar un torneo de La Placeta
 router.post('/torneos-organizados/:id/visibilidad', requireVoleyAdmin, async (req, res) => {
