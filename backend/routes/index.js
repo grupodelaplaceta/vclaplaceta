@@ -920,4 +920,81 @@ router.post('/fondos/movimiento', requireVoleyAdmin, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// POST /api/fondos/proyecto — crear proyecto del club
+router.post('/fondos/proyecto', requireVoleyAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const nombre = String(b.nombre || '').trim();
+    if (!nombre) return res.status(400).json({ error: 'El nombre del proyecto es obligatorio' });
+    const f = await _fondosDoc();
+    f.proyectos = f.proyectos || [];
+    const proyecto = {
+      id: (f.proyectos.reduce((m, p) => Math.max(m, Number(p.id) || 0), 0) || 0) + 1,
+      nombre,
+      descripcion: String(b.descripcion || ''),
+      objetivo: Number(b.objetivo) || 0,
+      recaudado: 0,
+      porcentajeGanancia: Number(b.porcentajeGanancia) || 0,
+      activo: true,
+    };
+    f.proyectos.push(proyecto);
+    await _saveFondos(f);
+    res.json({ success: true, proyecto });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/fondos/reparto — reparto de € de GDLP al Voley Club
+// (% a jugadores participantes o a bolsa de proyectos)
+router.post('/fondos/reparto', requireVoleyAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const cantidad = round2(Number(b.cantidad || 0));
+    if (cantidad <= 0) return res.status(400).json({ error: 'Cantidad inválida' });
+    const pctJugadores = Math.min(100, Math.max(0, Number(b.porcentajeJugadores ?? 100)));
+    const aJugadores = round2(cantidad * pctJugadores / 100);
+    const aBolsa = round2(cantidad - aJugadores);
+
+    // Jugadores participantes: los indicados o todos los activos.
+    let participantes = [];
+    if (Array.isArray(b.jugadorIds) && b.jugadorIds.length) {
+      const ids = b.jugadorIds.map(Number);
+      participantes = (await _miembrosArr()).filter((m) => ids.includes(m.id));
+    } else {
+      participantes = (await _miembrosArr()).filter((m) => m.activo !== false);
+    }
+    if (participantes.length === 0) return res.status(400).json({ error: 'Sin jugadores participantes' });
+
+    const porJugador = round2(aJugadores / participantes.length);
+    const concepto = String(b.concepto || 'Reparto GDLP · Voley Club');
+    const fecha = new Date().toISOString().split('T')[0];
+
+    for (const m of participantes) {
+      const cartera = m.cartera || { saldo: 0, movimientos: [] };
+      cartera.movimientos = cartera.movimientos || [];
+      cartera.movimientos.push({ id: cartera.movimientos.length + 1, fecha, concepto, tipo: 'ingreso', cantidad: porJugador, categoria: 'reparto_gdlp' });
+      cartera.saldo = round2((cartera.saldo || 0) + porJugador);
+      m.cartera = cartera;
+      await _saveMiembro(m);
+    }
+
+    const f = await _fondosDoc();
+    f.bolsaProyectos = round2((f.bolsaProyectos || 0) + aBolsa);
+    f.historial = f.historial || [];
+    f.historial.push({
+      id: f.historial.length + 1,
+      fecha,
+      concepto: `${concepto} (ingreso GDLP)`,
+      tipo: 'ingreso',
+      cantidad,
+      categoria: 'reparto_gdlp',
+      registradoPor: 'RSP',
+      detalle: { aJugadores, aBolsa, pctJugadores, porJugador, participantes: participantes.length }
+    });
+    f.saldoActual = round2((f.saldoActual || 0) + aBolsa);
+    await _saveFondos(f);
+
+    res.json({ success: true, cantidad, aJugadores, aBolsa, porJugador, participantes: participantes.length });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;
